@@ -109,6 +109,128 @@
             font-weight: 700;
         }
 
+        .receipt-history-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.55);
+            z-index: 60;
+            padding: 24px;
+        }
+
+        .receipt-history-modal.show {
+            display: flex;
+        }
+
+        .receipt-history-card {
+            width: min(760px, 100%);
+            max-height: 85vh;
+            overflow: auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+            padding: 24px;
+        }
+
+        .receipt-print-stage {
+            display: none;
+        }
+
+        .receipt-pdf-sheet {
+            width: 1123px;
+            min-height: 794px;
+            background: #fff;
+            color: #222;
+            padding: 34px 46px 28px;
+            font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif;
+            font-size: 18px;
+            line-height: 1.35;
+            box-sizing: border-box;
+        }
+
+        .receipt-pdf-sheet * {
+            box-sizing: border-box;
+        }
+
+        .receipt-pdf-header {
+            position: relative;
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .receipt-pdf-number {
+            position: absolute;
+            right: 0;
+            top: 0;
+            min-width: 180px;
+            text-align: left;
+        }
+
+        .receipt-pdf-title {
+            margin: 0;
+            font-size: 23px;
+        }
+
+        .receipt-pdf-subtitle {
+            margin: 4px 0 0;
+            font-size: 21px;
+        }
+
+        .receipt-pdf-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 10px;
+            font-size: 19px;
+        }
+
+        .receipt-pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            border: 1px solid #444;
+        }
+
+        .receipt-pdf-table th,
+        .receipt-pdf-table td {
+            border: 1px solid #444;
+            padding: 8px 10px;
+            vertical-align: top;
+        }
+
+        .receipt-pdf-table th {
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .receipt-pdf-center { text-align: center; }
+        .receipt-pdf-right { text-align: right; }
+        .receipt-pdf-note { text-align: center; }
+
+        .receipt-pdf-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 24px;
+            margin-top: 18px;
+            font-size: 17px;
+        }
+
+        .receipt-pdf-signature {
+            width: 320px;
+            margin-left: auto;
+            text-align: center;
+        }
+
+        .receipt-pdf-signature-line {
+            border-bottom: 1px dotted #444;
+            height: 24px;
+            margin: 10px 0 8px;
+        }
+
         @media print {
             body {
                 background: #fff !important;
@@ -122,7 +244,16 @@
                 display: none !important;
             }
 
-            .income-report-print-stage {
+            .income-report-print-stage,
+            .receipt-print-stage {
+                display: none !important;
+            }
+
+            body.print-income-report .income-report-print-stage {
+                display: block !important;
+            }
+
+            body.print-receipt-copy .receipt-print-stage {
                 display: block !important;
             }
 
@@ -136,6 +267,13 @@
 
             .income-report-page:last-child {
                 page-break-after: auto;
+            }
+
+            .receipt-pdf-sheet {
+                width: 100% !important;
+                min-height: auto !important;
+                margin: 0 !important;
+                padding: 18mm 14mm 12mm !important;
             }
         }
     </style>
@@ -191,11 +329,11 @@
                 <div class="border rounded-lg overflow-hidden">
                     <table class="min-w-full text-left bg-white">
                         <thead class="bg-blue-50">
-                            <tr><th class="px-4 py-3 border-b">ใบเสร็จ</th><th class="px-4 py-3 border-b">รหัสสมาชิก</th><th class="px-4 py-3 border-b">ชื่อ-สกุล</th><th class="px-4 py-3 border-b text-right">จำนวนเงิน (บาท)</th></tr>
+                            <tr><th class="px-4 py-3 border-b">ใบเสร็จ</th><th class="px-4 py-3 border-b">รหัสสมาชิก</th><th class="px-4 py-3 border-b">ชื่อ-สกุล</th><th class="px-4 py-3 border-b text-right">จำนวนเงิน (บาท)</th><th id="incomeActionHead" class="px-4 py-3 border-b text-center hidden">ประวัติ</th></tr>
                         </thead>
                         <tbody id="incomeTableBody"><tr><td colspan="4" class="text-center py-4 text-gray-500">กรุณาเลือกช่วงวันที่และกดดึงรายงาน</td></tr></tbody>
                         <tfoot class="bg-gray-100 font-bold">
-                            <tr><td colspan="3" class="px-4 py-3 text-right">รวมเงินรับทั้งสิ้น:</td><td id="income_total" class="px-4 py-3 text-right text-blue-600 text-lg">0.00</td></tr>
+                            <tr><td colspan="3" class="px-4 py-3 text-right">รวมเงินรับทั้งสิ้น:</td><td id="income_total" class="px-4 py-3 text-right text-blue-600 text-lg">0.00</td><td id="incomeActionFoot" class="hidden"></td></tr>
                         </tfoot>
                     </table>
                 </div>
@@ -264,11 +402,97 @@
 
     <div id="incomeReportPrintStage" class="income-report-print-stage" aria-hidden="true"></div>
 
+    <div id="receiptPrintStage" class="receipt-print-stage" aria-hidden="true">
+        <div id="receiptPdfTemplate" class="receipt-pdf-sheet">
+            <div class="receipt-pdf-header">
+                <div class="receipt-pdf-number">เลขที่ <span id="pdfReceiptNo">-</span></div>
+                <p class="receipt-pdf-title">กองทุนสวัสดิการชุมชนเทศบาลนครนครศรีธรรมราช</p>
+                <p class="receipt-pdf-subtitle">ใบเสร็จรับเงิน (Copy1)</p>
+            </div>
+
+            <div class="receipt-pdf-meta">
+                <div>ได้รับชำระเงินจาก <span id="pdfMemberName">-</span></div>
+                <div>วันที่ <span id="pdfReceiptDate">-</span></div>
+            </div>
+
+            <table class="receipt-pdf-table">
+                <colgroup>
+                    <col style="width: 14%;">
+                    <col style="width: 48%;">
+                    <col style="width: 10%;">
+                    <col style="width: 12%;">
+                    <col style="width: 16%;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>งวดที่</th>
+                        <th>งวดประจำวันที่</th>
+                        <th>จำนวน</th>
+                        <th>งวดละ</th>
+                        <th>จำนวนเงิน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="height: 260px;">
+                        <td id="pdfInstallmentNos" class="receipt-pdf-center">-</td>
+                        <td id="pdfPeriodRange" class="receipt-pdf-center">-</td>
+                        <td id="pdfInstallmentCount" class="receipt-pdf-center">0</td>
+                        <td id="pdfAmountPerInstallment" class="receipt-pdf-right">0.00</td>
+                        <td id="pdfTotalAmount" class="receipt-pdf-right">0.00</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" id="pdfAmountText" class="receipt-pdf-note">(ศูนย์บาทถ้วน)</td>
+                        <td colspan="2" class="receipt-pdf-right"><strong>รวมเงิน</strong></td>
+                        <td id="pdfTotalAmountFooter" class="receipt-pdf-right"><strong>0.00</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="receipt-pdf-footer">
+                <div>
+                    ผู้พิมพ์: <span id="pdfPrintedBy">-</span>
+                    วันที่พิมพ์: <span id="pdfPrintedAt">-</span>
+                </div>
+                <div class="receipt-pdf-signature">
+                    <div>ผู้รับเงิน</div>
+                    <div class="receipt-pdf-signature-line"><span id="pdfSignerName"></span></div>
+                    <div>(เจ้าหน้าที่รับเงิน)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="receiptHistoryModal" class="receipt-history-modal" aria-hidden="true">
+        <div class="receipt-history-card">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">ประวัติใบเสร็จย้อนหลัง</h3>
+                    <p id="receiptHistorySubtitle" class="text-sm text-gray-500 mt-1">เลือกใบเสร็จจากรายการรับเงินประจำวัน</p>
+                </div>
+                <button type="button" id="closeReceiptHistoryBtn" class="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold">ปิด</button>
+            </div>
+            <div id="receiptHistoryContent" class="mt-5 text-sm text-gray-700">กำลังโหลด...</div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="button" id="printPastReceiptBtn" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed" disabled>พิมพ์ใบเสร็จย้อนหลัง</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const printIncomeReportBtn = document.getElementById("printIncomeReportBtn");
+        const incomeActionHead = document.getElementById("incomeActionHead");
+        const incomeActionFoot = document.getElementById("incomeActionFoot");
+        const receiptHistoryModal = document.getElementById("receiptHistoryModal");
+        const receiptHistoryContent = document.getElementById("receiptHistoryContent");
+        const receiptHistorySubtitle = document.getElementById("receiptHistorySubtitle");
+        const closeReceiptHistoryBtn = document.getElementById("closeReceiptHistoryBtn");
+        const printPastReceiptBtn = document.getElementById("printPastReceiptBtn");
+        const currentUser = JSON.parse(userSession || "{}");
         let latestIncomeRows = [];
         let latestIncomeRange = { start: "", end: "" };
         let reloadAfterPrint = false;
+        let latestReceiptHistory = null;
+        const canManageReceiptHistory = currentUser.role === "admin" || currentUser.role === "superadmin";
 
         if (userSession) {
             document.getElementById("displayUserName").textContent = JSON.parse(userSession).full_name;
@@ -288,6 +512,18 @@
             document.getElementById("exp_start_date").value = today;
             document.getElementById("exp_end_date").value = today;
             document.getElementById("transaction_date").value = today;
+            if (canManageReceiptHistory) {
+                incomeActionHead.classList.remove("hidden");
+                incomeActionFoot.classList.remove("hidden");
+            }
+        });
+
+        closeReceiptHistoryBtn.addEventListener("click", closeReceiptHistoryModal);
+        printPastReceiptBtn.addEventListener("click", printPastReceiptFromHistory);
+        receiptHistoryModal.addEventListener("click", (event) => {
+            if (event.target === receiptHistoryModal) {
+                closeReceiptHistoryModal();
+            }
         });
 
         function switchTab(tabName) {
@@ -326,26 +562,229 @@
             printIncomeReportBtn.disabled = !enabled;
         }
 
+        function getIncomeColumnCount() {
+            return canManageReceiptHistory ? 5 : 4;
+        }
+
+        function openReceiptHistoryModal() {
+            receiptHistoryModal.classList.add("show");
+            receiptHistoryModal.setAttribute("aria-hidden", "false");
+        }
+
+        function closeReceiptHistoryModal() {
+            receiptHistoryModal.classList.remove("show");
+            receiptHistoryModal.setAttribute("aria-hidden", "true");
+        }
+
+        function formatDateTimeThai(dateValue) {
+            return new Date(dateValue).toLocaleString("th-TH");
+        }
+
+        function readThaiNumber(numberText) {
+            const digitText = ["", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
+            const scaleText = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน"];
+
+            if (!numberText || Number(numberText) === 0) {
+                return "";
+            }
+
+            if (numberText.length > 6) {
+                const head = numberText.slice(0, -6);
+                const tail = numberText.slice(-6);
+                return `${readThaiNumber(head)}ล้าน${readThaiNumber(tail)}`;
+            }
+
+            let result = "";
+            for (let i = 0; i < numberText.length; i += 1) {
+                const digit = Number(numberText[i]);
+                if (digit === 0) continue;
+
+                const pos = numberText.length - i - 1;
+                if (pos === 0 && digit === 1 && numberText.length > 1) {
+                    result += "เอ็ด";
+                } else if (pos === 1 && digit === 2) {
+                    result += "ยี่";
+                } else if (pos === 1 && digit === 1) {
+                    result += "";
+                } else {
+                    result += digitText[digit];
+                }
+
+                result += scaleText[pos];
+            }
+
+            return result;
+        }
+
+        function bahtText(value) {
+            const amount = Number(value || 0).toFixed(2);
+            if (Number(amount) === 0) {
+                return "ศูนย์บาทถ้วน";
+            }
+
+            const [integerPart, decimalPart] = amount.split(".");
+            const integerText = `${readThaiNumber(integerPart)}บาท`;
+            if (decimalPart === "00") {
+                return `${integerText}ถ้วน`;
+            }
+
+            return `${integerText}${readThaiNumber(decimalPart)}สตางค์`;
+        }
+
+        function getInstallmentSummary(installments) {
+            const installmentNos = installments
+                .map((item) => Number(item.installment_no))
+                .filter((item) => !Number.isNaN(item))
+                .sort((a, b) => a - b);
+
+            const dates = installments
+                .map((item) => item.period_date)
+                .filter(Boolean)
+                .sort((a, b) => new Date(a) - new Date(b));
+
+            const totalAmount = installments.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+            const firstAmount = installments.length ? (parseFloat(installments[0].amount) || 0) : 0;
+
+            const installmentRange = installmentNos.length
+                ? (installmentNos[0] === installmentNos[installmentNos.length - 1]
+                    ? `${installmentNos[0]}`
+                    : `${installmentNos[0]} - ${installmentNos[installmentNos.length - 1]}`)
+                : "-";
+
+            const periodRange = dates.length
+                ? (dates[0] === dates[dates.length - 1]
+                    ? formatDateThaiLong(dates[0])
+                    : `${formatDateThaiLong(dates[0])} - ${formatDateThaiLong(dates[dates.length - 1])}`)
+                : "-";
+
+            return {
+                installmentRange,
+                periodRange,
+                count: installments.length,
+                amountPerInstallment: firstAmount,
+                totalAmount
+            };
+        }
+
+        function fillPastReceiptTemplate(data) {
+            const summary = getInstallmentSummary(Array.isArray(data.installments) ? data.installments : []);
+            const memberName = data.member_name
+                || `${data.first_name || ""} ${data.last_name || ""}`.trim()
+                || data.member_code
+                || "-";
+            const printedBy = currentUser.full_name || "-";
+
+            document.getElementById("pdfReceiptNo").textContent = data.receipt_no || "-";
+            document.getElementById("pdfMemberName").textContent = memberName;
+            document.getElementById("pdfReceiptDate").textContent = data.receipt_date ? formatDateThai(data.receipt_date) : "-";
+            document.getElementById("pdfInstallmentNos").textContent = summary.installmentRange;
+            document.getElementById("pdfPeriodRange").textContent = summary.periodRange;
+            document.getElementById("pdfInstallmentCount").textContent = summary.count;
+            document.getElementById("pdfAmountPerInstallment").textContent = formatCurrency(summary.amountPerInstallment);
+            document.getElementById("pdfTotalAmount").textContent = formatCurrency(summary.totalAmount);
+            document.getElementById("pdfTotalAmountFooter").textContent = formatCurrency(summary.totalAmount);
+            document.getElementById("pdfAmountText").textContent = `(${bahtText(summary.totalAmount)})`;
+            document.getElementById("pdfPrintedBy").textContent = printedBy;
+            document.getElementById("pdfPrintedAt").textContent = formatDateTimeThai(new Date());
+            document.getElementById("pdfSignerName").textContent = printedBy;
+        }
+
+        async function viewReceiptHistory(receiptId) {
+            latestReceiptHistory = null;
+            printPastReceiptBtn.disabled = true;
+            receiptHistorySubtitle.textContent = `เลขที่ใบเสร็จ #${receiptId}`;
+            receiptHistoryContent.innerHTML = '<div class="text-center py-6 text-gray-500">กำลังโหลดข้อมูลใบเสร็จ...</div>';
+            openReceiptHistoryModal();
+
+            try {
+                const res = await fetch(`http://localhost:8000/api/incomes/receipts/${receiptId}`);
+                const result = await res.json();
+
+                if (result.status !== "success" || !result.data) {
+                    throw new Error(result.message || "ไม่พบข้อมูลใบเสร็จ");
+                }
+
+                latestReceiptHistory = result.data;
+                const installments = Array.isArray(result.data.installments) ? result.data.installments : [];
+                const summary = getInstallmentSummary(installments);
+                const memberName = `${result.data.first_name || ""} ${result.data.last_name || ""}`.trim() || "-";
+
+                receiptHistorySubtitle.textContent = `ใบเสร็จเลขที่ ${result.data.receipt_no || "-"} วันที่ ${result.data.receipt_date ? formatDateThai(result.data.receipt_date) : "-"}`;
+                receiptHistoryContent.innerHTML = `
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+                            <div class="text-xs uppercase tracking-wide text-slate-500">สมาชิก</div>
+                            <div class="mt-1 text-base font-semibold text-slate-800">${escapeHtml(memberName)}</div>
+                            <div class="mt-1 text-sm text-slate-600">เลขที่สมาชิก: ${escapeHtml(result.data.member_code || "-")}</div>
+                        </div>
+                        <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+                            <div class="text-xs uppercase tracking-wide text-slate-500">สรุปการรับเงิน</div>
+                            <div class="mt-1 text-sm text-slate-700">จำนวนงวด: <strong>${summary.count}</strong></div>
+                            <div class="mt-1 text-sm text-slate-700">งวดที่: <strong>${escapeHtml(summary.installmentRange)}</strong></div>
+                            <div class="mt-1 text-sm text-slate-700">รวมเงิน: <strong>${formatCurrency(summary.totalAmount)}</strong> บาท</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 rounded-xl border border-slate-200 overflow-hidden">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-slate-100 text-slate-700">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">งวดที่</th>
+                                    <th class="px-4 py-2 text-left">วันที่งวด</th>
+                                    <th class="px-4 py-2 text-right">จำนวนเงิน</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${installments.map((item) => `
+                                    <tr class="border-t border-slate-200">
+                                        <td class="px-4 py-2">${escapeHtml(item.installment_no || "-")}</td>
+                                        <td class="px-4 py-2">${item.period_date ? formatDateThai(item.period_date) : "-"}</td>
+                                        <td class="px-4 py-2 text-right">${formatCurrency(item.amount)}</td>
+                                    </tr>
+                                `).join("") || '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">ไม่พบรายการงวด</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                printPastReceiptBtn.disabled = false;
+            } catch (error) {
+                receiptHistoryContent.innerHTML = `<div class="rounded-xl bg-red-50 border border-red-200 text-red-600 px-4 py-4">${escapeHtml(error.message || "เปิดประวัติใบเสร็จไม่สำเร็จ")}</div>`;
+            }
+        }
+
+        function printPastReceiptFromHistory() {
+            if (!latestReceiptHistory) {
+                return;
+            }
+
+            fillPastReceiptTemplate(latestReceiptHistory);
+            closeReceiptHistoryModal();
+            document.body.classList.remove("print-income-report");
+            document.body.classList.add("print-receipt-copy");
+            window.print();
+        }
+
         async function loadDailyIncome() {
             const start = document.getElementById("income_start_date").value;
             const end = document.getElementById("income_end_date").value;
             const tbody = document.getElementById("incomeTableBody");
+            const columnCount = getIncomeColumnCount();
 
             latestIncomeRows = [];
             latestIncomeRange = { start, end };
             setIncomePrintButtonState(false);
+            latestReceiptHistory = null;
 
             if (!start || !end) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">กรุณาระบุช่วงวันที่ให้ครบ</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="${columnCount}" class="text-center py-4 text-red-500">กรุณาระบุช่วงวันที่ให้ครบ</td></tr>`;
                 return;
             }
 
             if (start > end) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="${columnCount}" class="text-center py-4 text-red-500">วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">กำลังโหลด...</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="${columnCount}" class="text-center py-4">กำลังโหลด...</td></tr>`;
             try {
                 const res = await fetch(`http://localhost:8000/api/reports/daily-income?start_date=${start}&end_date=${end}`);
                 const result = await res.json();
@@ -353,16 +792,17 @@
                     latestIncomeRows = Array.isArray(result.data) ? result.data : [];
                     tbody.innerHTML = "";
                     if (latestIncomeRows.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">ไม่มีรายการรับเงิน</td></tr>';
+                        tbody.innerHTML = `<tr><td colspan="${columnCount}" class="text-center py-4 text-red-500">ไม่มีรายการรับเงิน</td></tr>`;
                     }
                     latestIncomeRows.forEach((row) => {
-                        tbody.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="px-4 py-2">${escapeHtml(row.receipt_no)}</td><td class="px-4 py-2 text-blue-600">${escapeHtml(row.member_code || "-")}</td><td class="px-4 py-2">${escapeHtml(`${row.first_name || ""} ${row.last_name || ""}`.trim() || "-")}</td><td class="px-4 py-2 text-right">${formatCurrency(row.total_amount)}</td></tr>`;
+                        const actionCell = canManageReceiptHistory ? `<td class="px-4 py-2 text-center"><button type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs" onclick="viewReceiptHistory(${row.id})">ดูประวัติ</button></td>` : "";
+                        tbody.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="px-4 py-2">${escapeHtml(row.receipt_no)}</td><td class="px-4 py-2 text-blue-600">${escapeHtml(row.member_code || "-")}</td><td class="px-4 py-2">${escapeHtml(`${row.first_name || ""} ${row.last_name || ""}`.trim() || "-")}</td><td class="px-4 py-2 text-right">${formatCurrency(row.total_amount)}</td>${actionCell}</tr>`;
                     });
                     document.getElementById("income_total").textContent = formatCurrency(result.summary.total_amount || 0);
                     setIncomePrintButtonState(latestIncomeRows.length > 0);
                 }
             } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">เชื่อมต่อ API ล้มเหลว</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="${columnCount}" class="text-center py-4 text-red-500">เชื่อมต่อ API ล้มเหลว</td></tr>`;
             }
         }
 
@@ -473,13 +913,16 @@
 
             renderIncomePrintLayout();
             reloadAfterPrint = true;
+            document.body.classList.remove("print-receipt-copy");
+            document.body.classList.add("print-income-report");
             window.print();
         }
 
         window.addEventListener("afterprint", () => {
+            document.body.classList.remove("print-income-report", "print-receipt-copy");
+            document.getElementById("incomeReportPrintStage").innerHTML = "";
             if (reloadAfterPrint) {
                 reloadAfterPrint = false;
-                document.getElementById("incomeReportPrintStage").innerHTML = "";
             }
         });
 

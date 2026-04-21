@@ -480,6 +480,47 @@ app.post('/api/incomes/receipts', async (req, res) => {
 });
 
 // [PUT] ยกเลิกใบเสร็จรับเงิน (Void)
+app.get('/api/incomes/receipts/:id', async (req, res) => {
+    try {
+        const [receiptRows] = await promisePool.query(`
+            SELECT
+                r.id,
+                r.receipt_no,
+                r.receipt_date,
+                r.total_amount,
+                r.status,
+                m.member_code,
+                m.first_name,
+                m.last_name
+            FROM receipts r
+            LEFT JOIN members m ON r.member_id = m.id
+            WHERE r.id = ?
+            LIMIT 1
+        `, [req.params.id]);
+
+        if (!receiptRows.length) {
+            return res.status(404).json({ status: "error", message: "ไม่พบใบเสร็จนี้" });
+        }
+
+        const [installmentRows] = await promisePool.query(`
+            SELECT installment_no, period_date, amount
+            FROM receipt_installments
+            WHERE receipt_id = ?
+            ORDER BY installment_no ASC, period_date ASC
+        `, [req.params.id]);
+
+        res.json({
+            status: "success",
+            data: {
+                ...receiptRows[0],
+                installments: installmentRows
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: "ดึงรายละเอียดใบเสร็จล้มเหลว" });
+    }
+});
+
 app.put('/api/incomes/receipts/:id/void', async (req, res) => {
     try {
         const { void_reason } = req.body; 
@@ -570,7 +611,7 @@ app.get('/api/reports/daily-income', async (req, res) => {
         }
 
         const [rows] = await promisePool.query(`
-            SELECT r.receipt_no, r.receipt_date, m.member_code, m.first_name, m.last_name, r.total_amount 
+            SELECT r.id, r.receipt_no, r.receipt_date, m.member_code, m.first_name, m.last_name, r.total_amount 
             FROM receipts r 
             LEFT JOIN members m ON r.member_id = m.id 
             WHERE r.receipt_date BETWEEN ? AND ? AND r.status = 'active' 
