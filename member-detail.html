@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายละเอียดสมาชิก | กองทุนสวัสดิการชุมชนฯ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Prompt', sans-serif; } </style>
+    <script>
+        const userSession = localStorage.getItem('user_session');
+        if (!userSession) window.location.href = 'index.html';
+    </script>
+</head>
+<body class="bg-gray-100 flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-blue-800 text-white flex flex-col shadow-lg z-10 shrink-0">
+        <div class="p-6 text-center border-b border-blue-700">
+            <h1 class="text-xl font-bold">กองทุนสวัสดิการฯ</h1>
+            <p class="text-xs text-blue-300 mt-1">เทศบาลนครนครศรีธรรมราช</p>
+        </div>
+        <nav class="flex-grow p-4 space-y-2">
+            <a href="dashboard.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">🏠 แดชบอร์ด</a>
+            <a href="members.html" class="block w-full text-left px-4 py-3 bg-blue-900 hover:bg-blue-700 rounded-lg transition font-semibold">👥 จัดการสมาชิก</a>
+            <a href="receipt.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">💰 รับเงินสมทบ</a>
+            <a href="expense.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">💸 จ่ายสวัสดิการ</a>
+            <a href="reports.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">📊 รายงาน</a>
+        </nav>
+        <div class="p-4 border-t border-blue-700 text-sm bg-blue-900">
+            <p class="mb-2 text-gray-300">ผู้ใช้งาน: <br><span id="displayUserName" class="font-bold text-green-400 text-base">Loading...</span></p>
+            <button id="logoutBtn" class="w-full bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition font-semibold text-white shadow">ออกจากระบบ</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-8 overflow-y-auto w-full">
+        <div class="bg-white p-8 rounded-xl shadow-md border-t-4 border-blue-500 max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">ประวัติสมาชิก</h2>
+                <a href="members.html" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition font-semibold">กลับหน้ารายชื่อ</a>
+            </div>
+            
+            <div id="loading" class="text-center py-10 text-gray-500">กำลังโหลดข้อมูล... ⏳</div>
+            
+            <div id="memberDetails" class="hidden space-y-6">
+                <div class="bg-blue-50 p-6 rounded-lg border border-blue-100">
+                    <h3 class="text-lg font-bold text-blue-800 mb-4 border-b border-blue-200 pb-2">ข้อมูลส่วนตัว</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                        <p><span class="font-semibold w-32 inline-block">รหัสสมาชิก:</span> <span id="m_code" class="text-blue-600 font-bold"></span></p>
+                        <p><span class="font-semibold w-32 inline-block">เลขบัตร ปชช.:</span> <span id="m_national"></span></p>
+                        <p><span class="font-semibold w-32 inline-block">ชื่อ-นามสกุล:</span> <span id="m_fullname"></span></p>
+                        <p><span class="font-semibold w-32 inline-block">สถานะ:</span> <span id="m_status" class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800"></span></p>
+                        <p><span class="font-semibold w-32 inline-block">วันเกิด:</span> <span id="m_birth"></span></p>
+                        <p><span class="font-semibold w-32 inline-block">วันที่สมัคร:</span> <span id="m_join"></span></p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">ข้อมูลการติดต่อ</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                        <p class="md:col-span-2"><span class="font-semibold w-32 inline-block">ที่อยู่:</span> <span id="m_address"></span></p>
+                        <p><span class="font-semibold w-32 inline-block">เบอร์โทร:</span> <span id="m_phone"></span></p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">ประวัติการชำระเงิน</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-left text-sm">
+                            <thead class="bg-gray-50 text-gray-700">
+                                <tr>
+                                    <th class="px-4 py-3 border-b font-semibold">เลขใบเสร็จ</th>
+                                    <th class="px-4 py-3 border-b font-semibold">วันที่รับเงิน</th>
+                                    <th class="px-4 py-3 border-b font-semibold">งวดที่</th>
+                                    <th class="px-4 py-3 border-b font-semibold">ประจำเดือน</th>
+                                    <th class="px-4 py-3 border-b font-semibold text-right">จำนวนเงิน</th>
+                                </tr>
+                            </thead>
+                            <tbody id="installmentHistoryBody" class="text-gray-700">
+                                <tr><td colspan="5" class="px-4 py-6 text-center text-gray-400">กำลังโหลดประวัติการชำระเงิน...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        if(userSession) document.getElementById('displayUserName').textContent = JSON.parse(userSession).full_name;
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if(confirm('ต้องการออกจากระบบใช่หรือไม่?')) { localStorage.removeItem('user_session'); window.location.href = 'index.html'; }
+        });
+
+        // ดึง ID จาก URL (เช่น member-detail.html?id=1)
+        const urlParams = new URLSearchParams(window.location.search);
+        const memberId = urlParams.get('id');
+        const installmentHistoryBody = document.getElementById('installmentHistoryBody');
+
+        function formatThaiDate(dateValue) {
+            if (!dateValue) return '-';
+            return new Date(dateValue).toLocaleDateString('th-TH');
+        }
+
+        function renderInstallmentHistory(installments) {
+            installmentHistoryBody.innerHTML = '';
+            if (!installments.length) {
+                installmentHistoryBody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-gray-500">ยังไม่มีประวัติการชำระเงิน</td></tr>';
+                return;
+            }
+
+            installments.forEach(item => {
+                installmentHistoryBody.insertAdjacentHTML('beforeend', `
+                    <tr class="border-b last:border-0 hover:bg-gray-50">
+                        <td class="px-4 py-3 text-blue-600 font-medium">${item.receipt_no}</td>
+                        <td class="px-4 py-3">${formatThaiDate(item.receipt_date)}</td>
+                        <td class="px-4 py-3">${item.installment_no}</td>
+                        <td class="px-4 py-3">${formatThaiDate(item.period_date)}</td>
+                        <td class="px-4 py-3 text-right">${Number(item.amount || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if(!memberId) {
+                alert('ไม่พบรหัสสมาชิก กรุณากลับไปเลือกจากหน้ารายชื่อ');
+                window.location.href = 'members.html';
+                return;
+            }
+
+            try {
+                const [response, installmentResponse] = await Promise.all([
+                    fetch(`http://localhost:8000/api/members/${memberId}`),
+                    fetch(`http://localhost:8000/api/members/${memberId}/installments`)
+                ]);
+                const result = await response.json();
+                const installmentResult = await installmentResponse.json();
+
+                if(result.status === 'success') {
+                    const m = result.data;
+                    document.getElementById('m_code').textContent = m.member_code;
+                    document.getElementById('m_national').textContent = m.national_id;
+                    // ดึงชื่อคำนำหน้ามาต่อกัน (เนื่องจาก API ดึง id มา เราแสดงแบบพื้นฐานก่อน)
+                    document.getElementById('m_fullname').textContent = `${m.first_name} ${m.last_name}`;
+                    document.getElementById('m_birth').textContent = new Date(m.birth_date).toLocaleDateString('th-TH');
+                    document.getElementById('m_join').textContent = new Date(m.join_date).toLocaleDateString('th-TH');
+                    document.getElementById('m_address').textContent = m.address;
+                    document.getElementById('m_phone').textContent = m.phone || '-';
+                    
+                    const statusEl = document.getElementById('m_status');
+                    statusEl.textContent = m.status === 'active' ? 'ปกติ' : (m.status === 'deceased' ? 'เสียชีวิต' : 'ลาออก');
+                    if(m.status !== 'active') statusEl.className = "px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800";
+
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('memberDetails').classList.remove('hidden');
+                }
+                if (installmentResult.status === 'success') renderInstallmentHistory(installmentResult.data);
+            } catch (error) {
+                installmentHistoryBody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-red-500">โหลดประวัติการชำระเงินไม่สำเร็จ</td></tr>';
+                document.getElementById('loading').innerHTML = '<span class="text-red-500">โหลดข้อมูลไม่สำเร็จ</span>';
+            }
+        });
+    </script>
+</body>
+</html>

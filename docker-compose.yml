@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000" # ให้เครื่องเราเชื่อมต่อได้ผ่าน Port 8000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment: # ตั้งค่าการเชื่อมต่อฐานข้อมูล
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=secret
+      - DB_NAME=welfare_db
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: welfare_db
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:

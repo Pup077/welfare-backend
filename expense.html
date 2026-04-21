@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เบิกจ่ายสวัสดิการ | กองทุนสวัสดิการชุมชนฯ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Prompt', sans-serif; } </style>
+    <script>
+        const userSession = localStorage.getItem('user_session');
+        if (!userSession) window.location.href = 'index.html';
+    </script>
+</head>
+<body class="bg-gray-100 flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-blue-800 text-white flex flex-col shadow-lg z-10 shrink-0">
+        <div class="p-6 text-center border-b border-blue-700">
+            <h1 class="text-xl font-bold">กองทุนสวัสดิการฯ</h1>
+            <p class="text-xs text-blue-300 mt-1">เทศบาลนครนครศรีธรรมราช</p>
+        </div>
+        <nav class="flex-grow p-4 space-y-2">
+            <a href="dashboard.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">🏠 แดชบอร์ด</a>
+            <a href="members.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">👥 จัดการสมาชิก</a>
+            <a href="receipt.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">💰 รับเงินสมทบ</a>
+            <a href="expense.html" class="block w-full text-left px-4 py-3 bg-blue-900 hover:bg-blue-700 rounded-lg transition font-semibold">💸 จ่ายสวัสดิการ</a>
+            
+            <a href="reports.html" id="menu-reports" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">📊 รายงาน</a>
+            <a href="set-password.html" id="menu-settings" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition text-yellow-300">⚙️ จัดการผู้ใช้งาน</a>
+        </nav>
+        <div class="p-4 border-t border-blue-700 text-sm bg-blue-900">
+            <p class="mb-2 text-gray-300">ผู้ใช้งาน: <br><span id="displayUserName" class="font-bold text-green-400 text-base">Loading...</span></p>
+            <button id="logoutBtn" class="w-full bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition font-semibold text-white shadow">ออกจากระบบ</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-8 overflow-y-auto w-full">
+        <div class="bg-white p-8 rounded-xl shadow-md border-t-4 border-red-500 max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h2 class="text-2xl font-bold text-gray-800">ทำรายการเบิกจ่ายสวัสดิการ</h2>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500">เลขที่ใบสำคัญจ่าย</p>
+                    <p id="voucher_no_display" class="text-xl font-bold text-red-600">กำลังโหลด...</p>
+                </div>
+            </div>
+            
+            <form id="expenseForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-red-50 p-5 rounded-lg border border-red-100">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทการเบิกจ่าย *</label>
+                        <select id="expense_type" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 bg-white font-semibold text-red-700">
+                            <option value="">-- เลือกประเภทสวัสดิการ --</option>
+                            <option value="hospital">ชดเชยนอนโรงพยาบาล</option>
+                            <option value="funeral">จัดการศพ (เสียชีวิต)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">วันที่ทำรายการ *</label>
+                        <input type="date" id="voucher_date" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อสมาชิกผู้รับสวัสดิการ *</label>
+                        <select id="member_id" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
+                            <option value="">-- กำลังโหลดรายชื่อ... --</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">จุดจ่ายเงิน</label>
+                        <select id="terminal_id" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
+                            <option value="1">จุดที่ 1 (เคาน์เตอร์หลัก)</option>
+                            <option value="2">จุดที่ 2 (ลงพื้นที่)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="hospital_section" class="hidden space-y-4 border p-5 rounded-lg bg-white">
+                    <h3 class="font-bold text-blue-600 border-b pb-2">รายละเอียด: ชดเชยนอนโรงพยาบาล</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">วันที่เข้า รพ. *</label>
+                            <input type="date" id="check_in_date" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 hosp-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">วันที่ออก รพ. *</label>
+                            <input type="date" id="check_out_date" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 hosp-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">เรทชดเชย/คืน (บาท)</label>
+                            <input type="number" id="rate_per_night" value="300" readonly class="w-full px-4 py-2 bg-gray-100 border rounded-lg focus:outline-none">
+                        </div>
+                        <div class="md:col-span-3 text-right bg-blue-50 p-3 rounded-lg mt-2">
+                            <span class="text-gray-600 mr-4">จำนวนคืน: <span id="total_nights_display" class="font-bold text-blue-800 text-lg">0</span> คืน</span>
+                            <span class="text-gray-600">รวมเงินชดเชย: <span id="hosp_total_amount" class="font-bold text-red-600 text-xl">0.00</span> บาท</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="funeral_section" class="hidden space-y-4 border p-5 rounded-lg bg-white">
+                    <h3 class="font-bold text-gray-800 border-b pb-2">รายละเอียด: ค่าจัดการศพ</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">วันที่เสียชีวิต *</label>
+                            <input type="date" id="death_date" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-500 fun-input">
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="w-1/2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">อายุ (ปี) *</label>
+                                <input type="number" id="age_years" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-500 fun-input">
+                            </div>
+                            <div class="w-1/2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">เดือน</label>
+                                <input type="number" id="age_months" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-500 fun-input">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้รับเงิน (ผู้รับผลประโยชน์) *</label>
+                            <input type="text" id="beneficiary_name" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-500 fun-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">ความสัมพันธ์ *</label>
+                            <select id="relationship_id" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-500 fun-input">
+                                <option value="">-- กำลังโหลด... --</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2 text-right bg-gray-100 p-3 rounded-lg mt-2">
+                            <label class="text-gray-600 mr-2 font-bold">ยอดเงินช่วยเหลือ (บาท) * :</label>
+                            <input type="number" id="funeral_total_amount" placeholder="ระบุยอดเงิน" class="w-1/3 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 fun-input text-right font-bold text-red-600">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-6">
+                    <button type="submit" id="submitBtn" disabled class="px-8 py-3 bg-gray-400 text-white font-bold rounded-lg transition shadow-md">เลือกระเภทการเบิกจ่ายก่อน</button>
+                </div>
+            </form>
+            <div id="alertBox" class="hidden mt-4 px-4 py-3 rounded-lg text-sm text-center font-medium"></div>
+        </div>
+    </main>
+
+    <script>
+        // --- 1. ระบบผู้ใช้งานและสิทธิ์ (RBAC) ---
+        if(userSession) {
+            const user = JSON.parse(userSession);
+            let roleDisplay = "เจ้าหน้าที่";
+            if(user.role === 'superadmin') roleDisplay = "Super Admin";
+            if(user.role === 'admin') roleDisplay = "Admin";
+            
+            document.getElementById('displayUserName').innerHTML = `${user.full_name} <br><span class="text-xs text-blue-300">(${roleDisplay})</span>`;
+
+            // ซ่อนเมนูตามสิทธิ์
+            if(user.role === 'officer') document.getElementById('menu-reports').style.display = 'none';
+            if(user.role !== 'superadmin') document.getElementById('menu-settings').style.display = 'none';
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if(confirm('ต้องการออกจากระบบใช่หรือไม่?')) { localStorage.removeItem('user_session'); window.location.href = 'index.html'; }
+        });
+
+        // --- 2. การโหลดข้อมูลเมื่อเปิดหน้า ---
+        let currentVoucherNo = "";
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('voucher_date').value = new Date().toISOString().split('T')[0];
+            
+            // ดึงเลขที่ใบสำคัญจ่าย
+            try {
+                const res = await fetch('http://localhost:8000/api/utils/next-number/voucher');
+                const data = await res.json();
+                if (data.status === 'success') {
+                    currentVoucherNo = data.next_number;
+                    document.getElementById('voucher_no_display').textContent = currentVoucherNo;
+                }
+            } catch (err) { document.getElementById('voucher_no_display').textContent = "เชื่อมต่อระบบไม่ได้"; }
+
+            // ดึงความสัมพันธ์
+            try {
+                const refRes = await fetch('http://localhost:8000/api/references');
+                const refData = await refRes.json();
+                if (refData.status === 'success') {
+                    const relSelect = document.getElementById('relationship_id');
+                    relSelect.innerHTML = '<option value="">-- เลือกความสัมพันธ์ --</option>';
+                    refData.data.relationships.forEach(r => relSelect.innerHTML += `<option value="${r.id}">${r.name}</option>`);
+                }
+            } catch (error) {}
+
+            // 🌟 ดึงรายชื่อสมาชิกมาใส่ Dropdown
+            try {
+                const memberRes = await fetch('http://localhost:8000/api/members');
+                const memberData = await memberRes.json();
+                if (memberData.status === 'success') {
+                    const memberSelect = document.getElementById('member_id');
+                    memberSelect.innerHTML = '<option value="">-- ค้นหาและเลือกสมาชิก --</option>';
+                    memberData.data.forEach(m => {
+                        memberSelect.innerHTML += `<option value="${m.id}">[${m.member_code}] ${m.first_name} ${m.last_name}</option>`;
+                    });
+                }
+            } catch (err) {
+                document.getElementById('member_id').innerHTML = '<option value="">โหลดข้อมูลสมาชิกล้มเหลว</option>';
+            }
+        });
+
+        // --- 3. ระบบฟอร์ม Dynamic และคำนวณเงิน ---
+        const expenseType = document.getElementById('expense_type');
+        const hospitalSec = document.getElementById('hospital_section');
+        const funeralSec = document.getElementById('funeral_section');
+        const submitBtn = document.getElementById('submitBtn');
+
+        expenseType.addEventListener('change', (e) => {
+            const type = e.target.value;
+            hospitalSec.classList.toggle('hidden', type !== 'hospital');
+            funeralSec.classList.toggle('hidden', type !== 'funeral');
+            document.querySelectorAll('.hosp-input').forEach(el => el.required = (type === 'hospital'));
+            document.querySelectorAll('.fun-input').forEach(el => el.required = (type === 'funeral'));
+
+            if (type === 'hospital' || type === 'funeral') {
+                submitBtn.disabled = false;
+                submitBtn.className = "px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition shadow-md";
+                submitBtn.textContent = "บันทึกข้อมูลการจ่ายเงิน";
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.className = "px-8 py-3 bg-gray-400 text-white font-bold rounded-lg transition shadow-md";
+                submitBtn.textContent = "เลือกระเภทการเบิกจ่ายก่อน";
+            }
+        });
+
+        const checkIn = document.getElementById('check_in_date'), checkOut = document.getElementById('check_out_date'), rate = document.getElementById('rate_per_night');
+        function calcHospitalAmount() {
+            if (checkIn.value && checkOut.value) {
+                const start = new Date(checkIn.value), end = new Date(checkOut.value);
+                const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)); 
+                if (diffDays >= 0) {
+                    const total = diffDays * parseFloat(rate.value);
+                    document.getElementById('total_nights_display').textContent = diffDays;
+                    document.getElementById('hosp_total_amount').textContent = total.toLocaleString();
+                    return { days: diffDays, total: total };
+                }
+            }
+            return { days: 0, total: 0 };
+        }
+        checkIn.addEventListener('change', calcHospitalAmount); checkOut.addEventListener('change', calcHospitalAmount);
+
+        // --- 4. บันทึกข้อมูล ---
+        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const type = expenseType.value;
+            const alertBox = document.getElementById('alertBox');
+            submitBtn.textContent = "กำลังบันทึก..."; submitBtn.disabled = true;
+
+            let url = '', payload = {
+                voucher_no: currentVoucherNo, voucher_date: document.getElementById('voucher_date').value,
+                member_id: document.getElementById('member_id').value, terminal_id: document.getElementById('terminal_id').value,
+                employee_id: JSON.parse(userSession).employee_id || 1
+            };
+
+            if (type === 'hospital') {
+                url = 'http://localhost:8000/api/expenses/hospital';
+                const calc = calcHospitalAmount();
+                payload.check_in_date = checkIn.value; payload.check_out_date = checkOut.value;
+                payload.total_nights = calc.days; payload.rate_per_night = rate.value; payload.total_amount = calc.total;
+            } else if (type === 'funeral') {
+                url = 'http://localhost:8000/api/expenses/funeral';
+                payload.death_date = document.getElementById('death_date').value;
+                payload.age_years = document.getElementById('age_years').value;
+                payload.age_months = document.getElementById('age_months').value || 0;
+                payload.beneficiary_name = document.getElementById('beneficiary_name').value;
+                payload.relationship_id = document.getElementById('relationship_id').value;
+                payload.total_amount = document.getElementById('funeral_total_amount').value;
+            }
+
+            try {
+                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const result = await response.json();
+                if (result.status === 'success') { alert('บันทึกการเบิกจ่ายสำเร็จ!'); window.location.reload(); } 
+                else throw new Error(result.message);
+            } catch (error) {
+                alertBox.textContent = error.message; alertBox.className = "mt-4 px-4 py-3 rounded-lg text-sm text-center font-medium bg-red-100 text-red-700"; alertBox.classList.remove('hidden');
+            } finally {
+                submitBtn.textContent = "บันทึกข้อมูลการจ่ายเงิน"; submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

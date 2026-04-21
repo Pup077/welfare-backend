@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายชื่อสมาชิก | กองทุนสวัสดิการชุมชนฯ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Prompt', sans-serif; } </style>
+    <script>
+        const userSession = localStorage.getItem('user_session');
+        if (!userSession) window.location.href = 'index.html';
+    </script>
+</head>
+<body class="bg-gray-100 flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-blue-800 text-white flex flex-col shadow-lg z-10 shrink-0">
+        <div class="p-6 text-center border-b border-blue-700">
+            <h1 class="text-xl font-bold">กองทุนสวัสดิการฯ</h1>
+            <p class="text-xs text-blue-300 mt-1">เทศบาลนครนครศรีธรรมราช</p>
+        </div>
+        <nav class="flex-grow p-4 space-y-2">
+            <a href="dashboard.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">🏠 แดชบอร์ด</a>
+            <a href="members.html" class="block w-full text-left px-4 py-3 bg-blue-900 hover:bg-blue-700 rounded-lg transition font-semibold">👥 จัดการสมาชิก</a>
+            <a href="receipt.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">💰 รับเงินสมทบ</a>
+            <a href="expense.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">💸 จ่ายสวัสดิการ</a>
+            <a href="reports.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">📊 รายงาน</a>
+        </nav>
+        <div class="p-4 border-t border-blue-700 text-sm bg-blue-900">
+            <p class="mb-2 text-gray-300">ผู้ใช้งาน: <br><span id="displayUserName" class="font-bold text-green-400 text-base">Loading...</span></p>
+            <button id="logoutBtn" class="w-full bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition font-semibold text-white shadow">ออกจากระบบ</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-8 overflow-y-auto w-full">
+        <div class="flex justify-between items-end mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">จัดการรายชื่อสมาชิก</h2>
+                <p class="text-gray-500 text-sm mt-1">ค้นหาและดูข้อมูลสมาชิกทั้งหมดในระบบ</p>
+            </div>
+            <a href="add-member.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold shadow transition">
+                + เพิ่มสมาชิกใหม่
+            </a>
+        </div>
+
+        <div class="bg-white p-4 rounded-t-xl shadow-sm border-b">
+            <div class="flex gap-4">
+                <input type="text" id="searchInput" placeholder="พิมพ์ชื่อ, นามสกุล หรือเลขสมาชิก..." class="flex-grow px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button id="searchBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition">ค้นหา</button>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-md rounded-b-xl overflow-hidden">
+            <table class="min-w-full text-left border-collapse">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 border-b font-semibold">รหัสสมาชิก</th>
+                        <th class="px-6 py-3 border-b font-semibold">ชื่อ - นามสกุล</th>
+                        <th class="px-6 py-3 border-b font-semibold">ชุมชน</th>
+                        <th class="px-6 py-3 border-b font-semibold">สถานะ</th>
+                        <th class="px-6 py-3 border-b font-semibold text-center">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="memberTableBody" class="text-gray-600">
+                    <tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">กำลังโหลดข้อมูล... ⏳</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        if(userSession) document.getElementById('displayUserName').textContent = JSON.parse(userSession).full_name;
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if(confirm('ต้องการออกจากระบบใช่หรือไม่?')) { localStorage.removeItem('user_session'); window.location.href = 'index.html'; }
+        });
+
+        const tableBody = document.getElementById('memberTableBody');
+        const searchInput = document.getElementById('searchInput');
+
+        async function fetchMembers(searchQuery = '') {
+            tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">กำลังโหลดข้อมูล... ⏳</td></tr>`;
+            try {
+                const url = searchQuery ? `http://localhost:8000/api/members/search?q=${searchQuery}` : `http://localhost:8000/api/members`;
+                const response = await fetch(url);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    renderTable(result.data);
+                    bindHistoryButtons(result.data);
+                }
+            } catch (error) { tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-red-500">เชื่อมต่อ API ล้มเหลว</td></tr>`; }
+        }
+
+        function bindHistoryButtons(members) {
+            tableBody.querySelectorAll('button').forEach((button, index) => {
+                const member = members[index];
+                if (!member) return;
+                button.type = 'button';
+                button.dataset.memberId = member.id;
+                button.addEventListener('click', () => {
+                    window.location.href = `member-detail.html?id=${member.id}`;
+                });
+            });
+        }
+
+        function renderTable(members) {
+            tableBody.innerHTML = ''; 
+            if (members.length === 0) return tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">ไม่พบข้อมูลสมาชิก</td></tr>`;
+            members.forEach(member => {
+                const statusColor = member.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                const statusText = member.status === 'active' ? 'ปกติ' : (member.status === 'deceased' ? 'เสียชีวิต' : 'ลาออก/พ้นสภาพ');
+                tableBody.insertAdjacentHTML('beforeend', `
+                    <tr class="hover:bg-gray-50 transition border-b last:border-0">
+                        <td class="px-6 py-4 font-medium text-blue-600">${member.member_code}</td>
+                        <td class="px-6 py-4">${member.prefix_name || ''}${member.first_name} ${member.last_name}</td>
+                        <td class="px-6 py-4">${member.community_name || '- ไม่ระบุ -'}</td>
+                        <td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-semibold ${statusColor}">${statusText}</span></td>
+                        <td class="px-6 py-4 text-center">
+                            <button class="text-blue-500 hover:underline text-sm mr-2">ดูประวัติ</button>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        document.getElementById('searchBtn').addEventListener('click', () => fetchMembers(searchInput.value));
+        searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') fetchMembers(searchInput.value); });
+        window.onload = () => fetchMembers();
+    </script>
+</body>
+</html>
