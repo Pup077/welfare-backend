@@ -7,25 +7,79 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+class AppConfig {
+    static PORT = 8000;
+    static PASSWORD_SALT = 'WelfareFund_NakhonSi_2026';
+
+    // รวมค่าตั้งต้นของระบบไว้จุดเดียว เพื่อให้ปรับภายหลังได้ง่าย
+    static database() {
+        return {
+            host: process.env.DB_HOST || 'db',
+            user: process.env.DB_USER || 'root',
+            password: process.env.DB_PASSWORD || 'welfare_password',
+            database: process.env.DB_NAME || 'welfare_db',
+            waitForConnections: true,
+            connectionLimit: 20,
+            queueLimit: 0,
+            multipleStatements: true
+        };
+    }
+}
+
+class SecurityService {
+    static hashPassword(password) {
+        return crypto
+            .createHash('sha256')
+            .update(password + AppConfig.PASSWORD_SALT)
+            .digest('hex');
+    }
+}
+
+class ApiResponse {
+    static success(res, payload = {}, statusCode = 200) {
+        return res.status(statusCode).json({ status: 'success', ...payload });
+    }
+
+    static error(res, message, statusCode = 500, extra = {}) {
+        return res.status(statusCode).json({ status: 'error', message, ...extra });
+    }
+}
+
+class QueryHelper {
+    static sumBy(rows, fieldName) {
+        return rows.reduce((sum, row) => sum + parseFloat(row[fieldName] || 0), 0);
+    }
+}
+
+class DocumentNumberService {
+    static getConfig(type) {
+        const configMap = {
+            member: { prefix: 'MEM', table: 'members', column: 'member_code' },
+            receipt: { prefix: 'REC', table: 'receipts', column: 'receipt_no' },
+            voucher: { prefix: 'VOC', table: 'vouchers', column: 'voucher_no' }
+        };
+
+        return configMap[type] || configMap.voucher;
+    }
+
+    static getYearMonthKey() {
+        const now = new Date();
+        return (
+            (now.getFullYear() + 543).toString().slice(-2) +
+            (now.getMonth() + 1).toString().padStart(2, '0')
+        );
+    }
+}
+
 // ==========================================
 // 1. ตั้งค่าการเชื่อมต่อฐานข้อมูล MySQL
 // ==========================================
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'db',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'welfare_password',
-    database: process.env.DB_NAME || 'welfare_db',
-    waitForConnections: true,
-    connectionLimit: 20,
-    queueLimit: 0,
-    multipleStatements: true // อนุญาตให้รัน SQL หลายคำสั่งพร้อมกันได้
-});
+const pool = mysql.createPool(AppConfig.database());
 const promisePool = pool.promise();
 
 // ฟังก์ชันเข้ารหัสผ่าน (Security)
 function hashPassword(password) {
-    const secretSalt = "WelfareFund_NakhonSi_2026"; 
-    return crypto.createHash('sha256').update(password + secretSalt).digest('hex');
+    return SecurityService.hashPassword(password);
 }
 
 // ==========================================
@@ -256,13 +310,12 @@ app.post('/api/auth/login-secure', async (req, res) => {
         );
 
         if (users.length === 0) {
-            return res.status(401).json({ status: "error", message: "รหัสพนักงาน หรือ รหัสผ่านไม่ถูกต้อง!" });
+            return ApiResponse.error(res, 'รหัสพนักงาน หรือ รหัสผ่านไม่ถูกต้อง', 401);
         }
 
         const user = users[0];
-        res.json({
-            status: "success", 
-            message: "เข้าสู่ระบบสำเร็จ",
+        return ApiResponse.success(res, {
+            message: 'เข้าสู่ระบบสำเร็จ',
             user: { 
                 employee_id: user.id, 
                 emp_code: user.emp_code, 
@@ -272,7 +325,7 @@ app.post('/api/auth/login-secure', async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "ล็อกอินล้มเหลว" });
+        return ApiResponse.error(res, 'ล็อกอินล้มเหลว');
     }
 });
 
@@ -283,10 +336,13 @@ app.post('/api/auth/set-password', async (req, res) => {
         const hashedPassword = hashPassword(password);
         const [result] = await promisePool.query('UPDATE employees SET password_hash = ? WHERE emp_code = ?', [hashedPassword, emp_code]);
         
-        if (result.affectedRows === 0) return res.status(404).json({ status: "error", message: "ไม่พบรหัสพนักงานนี้" });
-        res.json({ status: "success", message: "ตั้งรหัสผ่านสำเร็จ!" });
+        if (result.affectedRows === 0) {
+            return ApiResponse.error(res, 'ไม่พบรหัสพนักงานนี้', 404);
+        }
+
+        return ApiResponse.success(res, { message: 'ตั้งรหัสผ่านสำเร็จ' });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "ตั้งรหัสผ่านล้มเหลว" });
+        return ApiResponse.error(res, 'ตั้งรหัสผ่านล้มเหลว');
     }
 });
 
@@ -294,9 +350,9 @@ app.post('/api/auth/set-password', async (req, res) => {
 app.get('/api/users', async (req, res) => {
     try {
         const [rows] = await promisePool.query('SELECT id, emp_code, full_name, position, role FROM employees ORDER BY id ASC');
-        res.json({ status: "success", data: rows });
+        return ApiResponse.success(res, { data: rows });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "ดึงข้อมูลผู้ใช้งานล้มเหลว" });
+        return ApiResponse.error(res, 'ดึงข้อมูลผู้ใช้งานล้มเหลว');
     }
 });
 
@@ -305,16 +361,18 @@ app.post('/api/auth/register', async (req, res) => {
     try {
         const { emp_code, full_name, position, password, role } = req.body;
         const [existing] = await promisePool.query('SELECT * FROM employees WHERE emp_code = ?', [emp_code]);
-        if (existing.length > 0) return res.status(400).json({ status: "error", message: "รหัสเจ้าหน้าที่นี้ มีในระบบแล้ว!" });
+        if (existing.length > 0) {
+            return ApiResponse.error(res, 'รหัสเจ้าหน้าที่นี้ มีในระบบแล้ว', 400);
+        }
 
         const hashedPassword = hashPassword(password);
         await promisePool.query(
             'INSERT INTO employees (emp_code, full_name, position, password_hash, role) VALUES (?, ?, ?, ?, ?)', 
             [emp_code, full_name, position, hashedPassword, role || 'officer']
         );
-        res.status(201).json({ status: "success", message: "สร้างผู้ใช้งานใหม่เรียบร้อยแล้ว!" });
+        return ApiResponse.success(res, { message: 'สร้างผู้ใช้งานใหม่เรียบร้อยแล้ว' }, 201);
     } catch (error) {
-        res.status(500).json({ status: "error", message: "สร้างผู้ใช้งานล้มเหลว" });
+        return ApiResponse.error(res, 'สร้างผู้ใช้งานล้มเหลว');
     }
 });
 
@@ -607,7 +665,7 @@ app.get('/api/reports/daily-income', async (req, res) => {
         const reportEndDate = end_date || date;
 
         if (!reportStartDate || !reportEndDate) {
-            return res.status(400).json({ status: "error", message: "กรุณาระบุวันที่หรือช่วงวันที่" });
+            return ApiResponse.error(res, 'กรุณาระบุวันที่หรือช่วงวันที่', 400);
         }
 
         const [rows] = await promisePool.query(`
@@ -618,10 +676,10 @@ app.get('/api/reports/daily-income', async (req, res) => {
             ORDER BY r.receipt_date ASC, r.receipt_no ASC
         `, [reportStartDate, reportEndDate]);
         
-        const totalSum = rows.reduce((sum, current) => sum + parseFloat(current.total_amount), 0);
-        res.json({ status: "success", data: rows, summary: { total_amount: totalSum } });
+        const totalSum = QueryHelper.sumBy(rows, 'total_amount');
+        return ApiResponse.success(res, { data: rows, summary: { total_amount: totalSum } });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "ดึงข้อมูลรายงานล้มเหลว" });
+        return ApiResponse.error(res, 'ดึงข้อมูลรายงานล้มเหลว');
     }
 });
 
@@ -635,9 +693,9 @@ app.get('/api/reports/weekly-income', async (req, res) => {
             WHERE status = 'active'
               AND YEARWEEK(receipt_date, 1) = YEARWEEK(CURRENT_DATE, 1)
         `);
-        res.json({ status: "success", summary: { total_amount: parseFloat(rows[0].total_amount) || 0 } });
+        return ApiResponse.success(res, { summary: { total_amount: parseFloat(rows[0].total_amount) || 0 } });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "ดึงข้อมูลยอดรับเงินสมทบรายสัปดาห์ล้มเหลว" });
+        return ApiResponse.error(res, 'ดึงข้อมูลยอดรับเงินสมทบรายสัปดาห์ล้มเหลว');
     }
 });
 
@@ -650,9 +708,9 @@ app.get('/api/reports/monthly-income', async (req, res) => {
               AND YEAR(receipt_date) = YEAR(CURRENT_DATE)
               AND MONTH(receipt_date) = MONTH(CURRENT_DATE)
         `);
-        res.json({ status: "success", summary: { total_amount: parseFloat(rows[0].total_amount) || 0 } });
+        return ApiResponse.success(res, { summary: { total_amount: parseFloat(rows[0].total_amount) || 0 } });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "ดึงข้อมูลยอดรับเงินสมทบรายเดือนล้มเหลว" });
+        return ApiResponse.error(res, 'ดึงข้อมูลยอดรับเงินสมทบรายเดือนล้มเหลว');
     }
 });
 
@@ -665,9 +723,9 @@ app.get('/api/reports/yearly-income', async (req, res) => {
             WHERE status = 'active'
               AND YEAR(receipt_date) = YEAR(CURRENT_DATE)
         `);
-        res.json({ status: "success", summary: { total_amount: parseFloat(rows[0].total_amount) || 0 } });
+        return ApiResponse.success(res, { summary: { total_amount: parseFloat(rows[0].total_amount) || 0 } });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "ดึงข้อมูลยอดรับเงินสมทบรายปีล้มเหลว" });
+        return ApiResponse.error(res, 'ดึงข้อมูลยอดรับเงินสมทบรายปีล้มเหลว');
     }
 });
 
@@ -685,9 +743,9 @@ app.get('/api/reports/overdue', async (req, res) => {
             HAVING overdue_months >= 3 OR overdue_months IS NULL 
             ORDER BY overdue_months DESC
         `);
-        res.json({ status: "success", total_overdue_members: rows.length, data: rows });
+        return ApiResponse.success(res, { total_overdue_members: rows.length, data: rows });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "ดึงข้อมูลค้างชำระล้มเหลว" });
+        return ApiResponse.error(res, 'ดึงข้อมูลค้างชำระล้มเหลว');
     }
 });
 
@@ -738,11 +796,11 @@ app.get('/api/reports/expenses', async (req, res) => {
             : `SELECT v.voucher_no, v.voucher_date, m.member_code, m.first_name, m.last_name, hc.check_in_date, hc.check_out_date, hc.total_nights, v.total_amount FROM vouchers v JOIN hospital_compensations hc ON v.id = hc.voucher_id JOIN members m ON v.member_id = m.id WHERE v.status = 'active' AND v.voucher_date BETWEEN ? AND ?`;
         
         const [rows] = await promisePool.query(sql, [start_date, end_date]);
-        const totalExpense = rows.reduce((sum, current) => sum + parseFloat(current.total_amount), 0);
-        
-        res.json({ status: "success", data: rows, summary: { total_expense_amount: totalExpense } });
+        const totalExpense = QueryHelper.sumBy(rows, 'total_amount');
+
+        return ApiResponse.success(res, { data: rows, summary: { total_expense_amount: totalExpense } });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "ดึงข้อมูลรายจ่ายล้มเหลว" });
+        return ApiResponse.error(res, 'ดึงข้อมูลรายจ่ายล้มเหลว');
     }
 });
 
@@ -794,20 +852,16 @@ app.get('/api/reports/transactions', async (req, res) => {
 app.get('/api/utils/next-number/:type', async (req, res) => {
     try {
         const { type } = req.params; 
-        let prefix = type === 'member' ? 'MEM' : (type === 'receipt' ? 'REC' : 'VOC');
-        let table = type === 'member' ? 'members' : (type === 'receipt' ? 'receipts' : 'vouchers');
-        let column = type === 'member' ? 'member_code' : (type === 'receipt' ? 'receipt_no' : 'voucher_no');
-
-        const now = new Date();
-        const yearMonth = (now.getFullYear() + 543).toString().slice(-2) + (now.getMonth() + 1).toString().padStart(2, '0');
+        const { prefix, table, column } = DocumentNumberService.getConfig(type);
+        const yearMonth = DocumentNumberService.getYearMonthKey();
         const pattern = `${prefix}${yearMonth}%`;
 
         const [rows] = await promisePool.query(`SELECT ${column} FROM ${table} WHERE ${column} LIKE ? ORDER BY ${column} DESC LIMIT 1`, [pattern]);
         
-        let nextNum = rows.length > 0 ? parseInt(rows[0][column].slice(-4)) + 1 : 1;
-        res.json({ status: "success", next_number: `${prefix}${yearMonth}${nextNum.toString().padStart(4, '0')}` });
+        const nextNum = rows.length > 0 ? parseInt(rows[0][column].slice(-4), 10) + 1 : 1;
+        return ApiResponse.success(res, { next_number: `${prefix}${yearMonth}${nextNum.toString().padStart(4, '0')}` });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "รันเลขล้มเหลว" });
+        return ApiResponse.error(res, 'รันเลขล้มเหลว');
     }
 });
 
@@ -815,9 +869,9 @@ app.get('/api/utils/next-number/:type', async (req, res) => {
 app.get('/api/settings', async (req, res) => {
     try {
         const [rows] = await promisePool.query('SELECT * FROM system_settings');
-        res.json({ status: "success", data: rows });
+        return ApiResponse.success(res, { data: rows });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "ดึงการตั้งค่าล้มเหลว" });
+        return ApiResponse.error(res, 'ดึงการตั้งค่าล้มเหลว');
     }
 });
 
@@ -825,16 +879,15 @@ app.get('/api/settings', async (req, res) => {
 app.put('/api/settings/:key', async (req, res) => {
     try {
         await promisePool.query('UPDATE system_settings SET setting_value = ? WHERE setting_key = ?', [req.body.value, req.params.key]);
-        res.json({ status: "success", message: `อัปเดตการตั้งค่าสำเร็จ` });
+        return ApiResponse.success(res, { message: 'อัปเดตการตั้งค่าสำเร็จ' });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "อัปเดตตั้งค่าล้มเหลว" });
+        return ApiResponse.error(res, 'อัปเดตตั้งค่าล้มเหลว');
     }
 });
 
 // ==========================================
 // เริ่มต้นเซิร์ฟเวอร์
 // ==========================================
-const PORT = 8000;
-app.listen(PORT, () => { 
-    console.log(`Server is running beautifully on port ${PORT}`); 
+app.listen(AppConfig.PORT, () => { 
+    console.log(`Server is running beautifully on port ${AppConfig.PORT}`); 
 });

@@ -1,190 +1,167 @@
 // ==========================================
-// ไฟล์: src/services/api.js
-// ศูนย์รวมการเชื่อมต่อ API สำหรับ Frontend
+// ไฟล์: services/api.js
+// หน้าที่: รวมคลาสเรียก API สำหรับหน้าเว็บที่ต้องการใช้งานแบบ OOP
 // ==========================================
 
-const BASE_URL = 'http://localhost:8000/api';
-
-// Helper Function สำหรับจัดการ Error กลาง
-async function handleResponse(response) {
-    const data = await response.json();
-    if (!response.ok) {
-        throw new Error(data.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ');
+class BaseApiService {
+    constructor(baseUrl = 'http://localhost:8000/api') {
+        this.baseUrl = baseUrl;
     }
-    return data;
+
+    // เมธอดกลางสำหรับยิง request และแปลง error ให้รูปแบบเดียวกัน
+    async request(path, options = {}) {
+        const response = await fetch(`${this.baseUrl}${path}`, {
+            headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+            ...options
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || result.status === 'error') {
+            throw new Error(result.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อระบบ');
+        }
+
+        return result;
+    }
+
+    get(path) {
+        return this.request(path);
+    }
+
+    post(path, payload) {
+        return this.request(path, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+    }
+
+    put(path, payload) {
+        return this.request(path, {
+            method: 'PUT',
+            body: JSON.stringify(payload)
+        });
+    }
 }
 
-// ==========================================
-// 1. หมวดเจ้าหน้าที่ (Auth)
-// ==========================================
-export const AuthAPI = {
-    // ล็อกอินเข้าสู่ระบบ
-    login: async (username, password, terminal_id = 1) => {
-        const res = await fetch(`${BASE_URL}/auth/login-secure`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, terminal_id })
+class AuthService extends BaseApiService {
+    login(username, password, terminalId = 1) {
+        return this.post('/auth/login-secure', {
+            username,
+            password,
+            terminal_id: terminalId
         });
-        return handleResponse(res);
-    },
-    // ลงทะเบียนแอดมินใหม่
-    register: async (empData) => {
-        const res = await fetch(`${BASE_URL}/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(empData)
-        });
-        return handleResponse(res);
     }
-};
 
-// ==========================================
-// 2. หมวดข้อมูลสมาชิก (Members)
-// ==========================================
-export const MemberAPI = {
-    // ดึงสมาชิกทั้งหมด (จำกัด 100 รายการ)
-    getAll: async () => {
-        const res = await fetch(`${BASE_URL}/members`);
-        return handleResponse(res);
-    },
-    // ค้นหาสมาชิก (ใช้ ?q=ชื่อ หรือ ?community_id=1)
-    search: async (queryString) => {
-        // ตัวอย่าง queryString: "q=สมชาย&community_id=1"
-        const res = await fetch(`${BASE_URL}/members/search?${queryString}`);
-        return handleResponse(res);
-    },
-    // ดึงข้อมูลสมาชิก 1 คน (เพื่อดูประวัติ/แก้ไข)
-    getById: async (id) => {
-        const res = await fetch(`${BASE_URL}/members/${id}`);
-        return handleResponse(res);
-    },
-    // เพิ่มสมาชิกใหม่
-    create: async (memberData) => {
-        const res = await fetch(`${BASE_URL}/members`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(memberData)
-        });
-        return handleResponse(res);
-    },
-    // อัปเดต/ยกเลิกสมาชิก
-    update: async (id, updateData) => {
-        const res = await fetch(`${BASE_URL}/members/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updateData)
-        });
-        return handleResponse(res);
+    register(employeeData) {
+        return this.post('/auth/register', employeeData);
     }
-};
 
-// ==========================================
-// 3. หมวดรายรับ (Incomes)
-// ==========================================
-export const IncomeAPI = {
-    // บันทึกใบเสร็จรับเงิน (ส่งงวดมาเป็น Array)
-    createReceipt: async (receiptData) => {
-        const res = await fetch(`${BASE_URL}/incomes/receipts`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(receiptData)
+    setPassword(empCode, password) {
+        return this.post('/auth/set-password', {
+            emp_code: empCode,
+            password
         });
-        return handleResponse(res);
-    },
-    // ดึงประวัติว่าสมาชิกคนนี้จ่ายถึงงวดไหนแล้ว
-    getInstallmentsByMember: async (memberId) => {
-        const res = await fetch(`${BASE_URL}/members/${memberId}/installments`);
-        return handleResponse(res);
-    },
-    // ยกเลิกใบเสร็จ
-    voidReceipt: async (receiptId, reason) => {
-        const res = await fetch(`${BASE_URL}/incomes/receipts/${receiptId}/void`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ void_reason: reason })
-        });
-        return handleResponse(res);
     }
-};
+}
 
-// ==========================================
-// 4. หมวดรายจ่าย (Expenses)
-// ==========================================
-export const ExpenseAPI = {
-    // เบิกค่าชดเชยโรงพยาบาล
-    createHospitalVoucher: async (voucherData) => {
-        const res = await fetch(`${BASE_URL}/expenses/hospital`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(voucherData)
-        });
-        return handleResponse(res);
-    },
-    // เบิกค่าทำศพ
-    createFuneralVoucher: async (voucherData) => {
-        const res = await fetch(`${BASE_URL}/expenses/funeral`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(voucherData)
-        });
-        return handleResponse(res);
+class MemberService extends BaseApiService {
+    getAll() {
+        return this.get('/members');
     }
-};
 
-// ==========================================
-// 5. หมวดรายงาน (Reports)
-// ==========================================
-export const ReportAPI = {
-    // ยอดรับเงินรายวัน
-    getDailyIncome: async (dateStr) => { // ส่งแบบ 'YYYY-MM-DD'
-        const res = await fetch(`${BASE_URL}/reports/daily-income?date=${dateStr}`);
-        return handleResponse(res);
-    },
-    // สมาชิกค้างชำระ (> 3 งวด)
-    getWeeklyIncome: async () => {
-        const res = await fetch(`${BASE_URL}/reports/weekly-income`);
-        return handleResponse(res);
-    },
-    getMonthlyIncome: async () => {
-        const res = await fetch(`${BASE_URL}/reports/monthly-income`);
-        return handleResponse(res);
-    },
-    getYearlyIncome: async () => {
-        const res = await fetch(`${BASE_URL}/reports/yearly-income`);
-        return handleResponse(res);
-    },
-    getOverdue: async () => {
-        const res = await fetch(`${BASE_URL}/reports/overdue`);
-        return handleResponse(res);
-    },
-    getOverdueSummary: async () => {
-        const res = await fetch(`${BASE_URL}/reports/overdue-summary`);
-        return handleResponse(res);
-    },
-    // สรุปรายจ่าย (type = 'hospital' หรือ 'funeral')
-    getExpenses: async (type, startDate, endDate) => {
-        const res = await fetch(`${BASE_URL}/reports/expenses?type=${type}&start_date=${startDate}&end_date=${endDate}`);
-        return handleResponse(res);
+    search(queryString) {
+        return this.get(`/members/search?${queryString}`);
     }
-};
 
-// ==========================================
-// 6. หมวดตัวช่วยและการตั้งค่า (Utils & Settings)
-// ==========================================
-export const UtilAPI = {
-    // ดึงข้อมูล Dropdown ทั้งหมด (คำนำหน้า, อาชีพ, ตำบล ฯลฯ)
-    getReferences: async () => {
-        const res = await fetch(`${BASE_URL}/references`);
-        return handleResponse(res);
-    },
-    // ขอเลขที่เอกสารล่าสุด (type: 'member', 'receipt', 'voucher')
-    getNextNumber: async (type) => {
-        const res = await fetch(`${BASE_URL}/utils/next-number/${type}`);
-        return handleResponse(res);
-    },
-    // ดึงการตั้งค่าระบบ (เช่น ค่าสมทบรายเดือน)
-    getSettings: async () => {
-        const res = await fetch(`${BASE_URL}/settings`);
-        return handleResponse(res);
+    getById(id) {
+        return this.get(`/members/${id}`);
     }
+
+    create(memberData) {
+        return this.post('/members', memberData);
+    }
+
+    update(id, updateData) {
+        return this.put(`/members/${id}`, updateData);
+    }
+
+    getInstallmentsByMember(memberId) {
+        return this.get(`/members/${memberId}/installments`);
+    }
+}
+
+class IncomeService extends BaseApiService {
+    createReceipt(receiptData) {
+        return this.post('/incomes/receipts', receiptData);
+    }
+
+    voidReceipt(receiptId, reason) {
+        return this.put(`/incomes/receipts/${receiptId}/void`, {
+            void_reason: reason
+        });
+    }
+}
+
+class ExpenseService extends BaseApiService {
+    createHospitalVoucher(voucherData) {
+        return this.post('/expenses/hospital', voucherData);
+    }
+
+    createFuneralVoucher(voucherData) {
+        return this.post('/expenses/funeral', voucherData);
+    }
+}
+
+class ReportService extends BaseApiService {
+    getDailyIncome(dateStr) {
+        return this.get(`/reports/daily-income?date=${dateStr}`);
+    }
+
+    getWeeklyIncome() {
+        return this.get('/reports/weekly-income');
+    }
+
+    getMonthlyIncome() {
+        return this.get('/reports/monthly-income');
+    }
+
+    getYearlyIncome() {
+        return this.get('/reports/yearly-income');
+    }
+
+    getOverdue() {
+        return this.get('/reports/overdue');
+    }
+
+    getOverdueSummary() {
+        return this.get('/reports/overdue-summary');
+    }
+
+    getExpenses(type, startDate, endDate) {
+        return this.get(`/reports/expenses?type=${type}&start_date=${startDate}&end_date=${endDate}`);
+    }
+}
+
+class UtilityService extends BaseApiService {
+    getReferences() {
+        return this.get('/references');
+    }
+
+    getNextNumber(type) {
+        return this.get(`/utils/next-number/${type}`);
+    }
+
+    getSettings() {
+        return this.get('/settings');
+    }
+}
+
+window.WelfareApi = {
+    BaseApiService,
+    AuthService,
+    MemberService,
+    IncomeService,
+    ExpenseService,
+    ReportService,
+    UtilityService
 };

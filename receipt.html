@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>รับเงินสมทบ | กองทุนสวัสดิการชุมชน</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: "Prompt", sans-serif;
-        }
-
+        body { font-family: "Prompt", sans-serif; }
         .receipt-pdf-stage {
             position: fixed;
             left: -10000px;
@@ -21,7 +17,6 @@
             pointer-events: none;
             z-index: -1;
         }
-
         .receipt-pdf-sheet {
             width: 1123px;
             min-height: 794px;
@@ -32,35 +27,11 @@
             font-size: 18px;
             line-height: 1.35;
         }
-
-        .receipt-pdf-sheet * {
-            box-sizing: border-box;
-        }
-
-        .receipt-pdf-header {
-            position: relative;
-            text-align: center;
-            margin-bottom: 22px;
-        }
-
-        .receipt-pdf-number {
-            position: absolute;
-            right: 0;
-            top: 0;
-            min-width: 180px;
-            text-align: left;
-        }
-
-        .receipt-pdf-title {
-            margin: 0;
-            font-size: 23px;
-        }
-
-        .receipt-pdf-subtitle {
-            margin: 4px 0 0;
-            font-size: 21px;
-        }
-
+        .receipt-pdf-sheet * { box-sizing: border-box; }
+        .receipt-pdf-header { position: relative; text-align: center; margin-bottom: 22px; }
+        .receipt-pdf-number { position: absolute; right: 0; top: 0; min-width: 180px; text-align: left; }
+        .receipt-pdf-title { margin: 0; font-size: 23px; }
+        .receipt-pdf-subtitle { margin: 4px 0 0; font-size: 21px; }
         .receipt-pdf-meta {
             display: flex;
             justify-content: space-between;
@@ -69,38 +40,22 @@
             margin-bottom: 10px;
             font-size: 19px;
         }
-
         .receipt-pdf-table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
             border: 1px solid #444;
         }
-
         .receipt-pdf-table th,
         .receipt-pdf-table td {
             border: 1px solid #444;
             padding: 8px 10px;
             vertical-align: top;
         }
-
-        .receipt-pdf-table th {
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .receipt-pdf-center {
-            text-align: center;
-        }
-
-        .receipt-pdf-right {
-            text-align: right;
-        }
-
-        .receipt-pdf-note {
-            text-align: center;
-        }
-
+        .receipt-pdf-table th { font-weight: 700; text-align: center; }
+        .receipt-pdf-center { text-align: center; }
+        .receipt-pdf-right { text-align: right; }
+        .receipt-pdf-note { text-align: center; }
         .receipt-pdf-footer {
             display: flex;
             justify-content: space-between;
@@ -109,32 +64,15 @@
             margin-top: 18px;
             font-size: 17px;
         }
-
-        .receipt-pdf-signature {
-            width: 320px;
-            margin-left: auto;
-            text-align: center;
-        }
-
+        .receipt-pdf-signature { width: 320px; margin-left: auto; text-align: center; }
         .receipt-pdf-signature-line {
             border-bottom: 1px dotted #444;
             height: 24px;
             margin: 10px 0 8px;
         }
-
         @media print {
-            body {
-                background: #fff !important;
-                display: block !important;
-                height: auto !important;
-                overflow: visible !important;
-            }
-
-            aside,
-            main {
-                display: none !important;
-            }
-
+            body { background: #fff !important; display: block !important; height: auto !important; overflow: visible !important; }
+            aside, main { display: none !important; }
             .receipt-pdf-stage {
                 position: static !important;
                 left: auto !important;
@@ -144,7 +82,6 @@
                 pointer-events: auto !important;
                 z-index: auto !important;
             }
-
             .receipt-pdf-sheet {
                 width: 100% !important;
                 min-height: auto !important;
@@ -152,17 +89,12 @@
             }
         }
     </style>
-    <script>
-        const userSession = localStorage.getItem("user_session");
-        if (!userSession) {
-            window.location.href = "index.html";
-        }
-    </script>
+    <script src="services/frontend.js"></script>
 </head>
 <body class="bg-gray-100 flex h-screen overflow-hidden">
     <aside class="w-64 bg-blue-800 text-white flex flex-col shadow-lg z-10 shrink-0">
         <div class="p-6 text-center border-b border-blue-700">
-            <h1 class="text-xl font-bold">กองทุนสวัสดิการฯ</h1>
+            <h1 class="text-xl font-bold">กองทุนสวัสดิการชุมชน</h1>
             <p class="text-xs text-blue-300 mt-1">เทศบาลนครนครศรีธรรมราช</p>
         </div>
         <nav class="flex-grow p-4 space-y-2">
@@ -171,24 +103,18 @@
             <a href="receipt.html" class="block w-full text-left px-4 py-3 bg-blue-900 hover:bg-blue-700 rounded-lg transition font-semibold">💰 รับเงินสมทบ</a>
             <a href="expense.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">💸 จ่ายสวัสดิการ</a>
             <a href="reports.html" id="menu-reports" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">📊 รายงาน</a>
-            <a href="set-password.html" id="menu-settings" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition text-yellow-300">⚙️ จัดการผู้ใช้งาน</a>
+            <a href="set-password.html" id="menu-settings" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition text-yellow-300">จัดการผู้ใช้งาน</a>
         </nav>
         <div class="p-4 border-t border-blue-700 text-sm bg-blue-900">
-            <p class="mb-2 text-gray-300">
-                ผู้ใช้งาน:
-                <br>
-                <span id="displayUserName" class="font-bold text-green-400 text-base">Loading...</span>
-            </p>
-            <button id="logoutBtn" class="w-full bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition font-semibold text-white shadow">
-                ออกจากระบบ
-            </button>
+            <p class="mb-2 text-gray-300">ผู้ใช้งาน:<br><span id="displayUserName" class="font-bold text-green-400 text-base">Loading...</span></p>
+            <button id="logoutBtn" class="w-full bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition font-semibold text-white shadow">ออกจากระบบ</button>
         </div>
     </aside>
 
     <main class="flex-1 p-8 overflow-y-auto w-full">
         <div class="bg-white p-8 rounded-xl shadow-md border-t-4 border-blue-500 max-w-5xl mx-auto">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 class="text-2xl font-bold text-gray-800">💰 รับเงินสมทบ (ออกใบเสร็จ)</h2>
+                <h2 class="text-2xl font-bold text-gray-800">รับเงินสมทบ (ออกใบเสร็จ)</h2>
                 <div class="text-right">
                     <p class="text-sm text-gray-500">เลขที่ใบเสร็จ</p>
                     <p id="receipt_no_display" class="text-xl font-bold text-blue-600">กำลังโหลด...</p>
@@ -201,17 +127,15 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">วันที่รับเงิน *</label>
                         <input type="date" id="receipt_date" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                     </div>
-
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อสมาชิกผู้ชำระเงิน *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">สมาชิกผู้ชำระเงิน *</label>
                         <div class="relative">
-                            <input id="member_search" type="text" autocomplete="off" placeholder="ค้นหาชื่อหรือรหัสสมาชิก" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <input id="member_search" type="text" autocomplete="off" placeholder="ค้นหาชื่อหรือลำดับสมาชิก" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                             <input id="member_id" type="hidden" required>
                             <div id="member_dropdown" class="hidden absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"></div>
                         </div>
                         <p id="member_helper" class="mt-1 text-xs text-gray-500">พิมพ์เพื่อค้นหา แล้วคลิกเลือกรายชื่อสมาชิก</p>
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">จุดรับเงิน</label>
                         <select id="terminal_id" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -225,7 +149,7 @@
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-lg font-semibold text-gray-800">รายการรับเงินสมทบ</h3>
                         <button type="button" id="addRowBtn" class="text-sm bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded-lg font-semibold transition">
-                            + เพิ่มงวดใหม่
+                            เพิ่มงวดใหม่
                         </button>
                     </div>
                     <div class="border rounded-lg overflow-hidden">
@@ -233,7 +157,7 @@
                             <thead class="bg-blue-50 text-blue-800">
                                 <tr>
                                     <th class="px-4 py-2 border-b">งวดที่</th>
-                                    <th class="px-4 py-2 border-b">งวดประจำวันที่</th>
+                                    <th class="px-4 py-2 border-b">งวดประจำเดือน</th>
                                     <th class="px-4 py-2 border-b text-right">จำนวนเงิน (บาท)</th>
                                     <th class="px-4 py-2 border-b text-center">ลบ</th>
                                 </tr>
@@ -266,7 +190,7 @@
             <div class="receipt-pdf-header">
                 <div class="receipt-pdf-number">เลขที่ <span id="pdfReceiptNo">-</span></div>
                 <p class="receipt-pdf-title">กองทุนสวัสดิการชุมชนเทศบาลนครนครศรีธรรมราช</p>
-                <p class="receipt-pdf-subtitle">ใบเสร็จรับเงิน (Copy1)</p>
+                <p class="receipt-pdf-subtitle">ใบเสร็จรับเงิน</p>
             </div>
 
             <div class="receipt-pdf-meta">
@@ -285,7 +209,7 @@
                 <thead>
                     <tr>
                         <th>งวดที่</th>
-                        <th>งวดประจำวันที่</th>
+                        <th>งวดประจำเดือน</th>
                         <th>จำนวน</th>
                         <th>งวดละ</th>
                         <th>จำนวนเงิน</th>
@@ -322,420 +246,308 @@
     </div>
 
     <script>
-        const user = JSON.parse(userSession || "{}");
-        const memberSearchInput = document.getElementById("member_search");
-        const memberIdInput = document.getElementById("member_id");
-        const memberDropdown = document.getElementById("member_dropdown");
-        const memberHelper = document.getElementById("member_helper");
-        const tableBody = document.getElementById("installmentTableBody");
-        const addRowBtn = document.getElementById("addRowBtn");
-        const submitBtn = document.getElementById("submitBtn");
-        const alertBox = document.getElementById("alertBox");
-
-        let currentReceiptNo = "";
-        let memberOptions = [];
-        let filteredMemberOptions = [];
-        let selectedMember = null;
-        let reloadAfterPrint = false;
-
-        function showAlert(message, type = "error") {
-            alertBox.textContent = message;
-            alertBox.className = `mt-4 px-4 py-3 rounded-lg text-sm text-center font-medium ${type === "error" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`;
-            alertBox.classList.remove("hidden");
-        }
-
-        function hideAlert() {
-            alertBox.classList.add("hidden");
-        }
-
-        function escapeHtml(value) {
-            return String(value ?? "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#39;");
-        }
-
-        function formatCurrency(value) {
-            return Number(value || 0).toLocaleString("th-TH", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
-
-        function formatThaiDate(dateString) {
-            if (!dateString) return "-";
-            const date = new Date(dateString);
-            if (Number.isNaN(date.getTime())) return dateString;
-            return date.toLocaleDateString("th-TH", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric"
-            });
-        }
-
-        function formatThaiLongDate(dateString) {
-            if (!dateString) return "-";
-            const date = new Date(dateString);
-            if (Number.isNaN(date.getTime())) return dateString;
-            const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-            return `${date.getDate()} ${thaiMonths[date.getMonth()]} ${date.getFullYear() + 543}`;
-        }
-
-        function formatThaiDateTime(date) {
-            return date.toLocaleString("th-TH", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit"
-            });
-        }
-
-        function readThaiNumber(numberText) {
-            const digitText = ["ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
-            const scaleText = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน"];
-
-            if (!numberText || Number(numberText) === 0) {
-                return "";
+        class ReceiptPage extends WelfareApp.BasePage {
+            constructor() {
+                super();
+                this.alertBox = new WelfareApp.AlertBoxController(this.getElement('alertBox'));
+                this.memberOptions = [];
+                this.selectedMember = null;
+                this.currentReceiptNo = '';
+                this.reloadAfterPrint = false;
             }
 
-            if (numberText.length > 6) {
-                const head = numberText.slice(0, -6);
-                const tail = numberText.slice(-6);
-                return `${readThaiNumber(head)}ล้าน${readThaiNumber(tail)}`;
-            }
+            init() {
+                const user = this.session.requireLogin();
+                if (!user) return;
+                this.user = user;
 
-            let result = "";
-            for (let i = 0; i < numberText.length; i += 1) {
-                const digit = Number(numberText[i]);
-                if (digit === 0) continue;
-
-                const pos = numberText.length - i - 1;
-                if (pos === 0 && digit === 1 && numberText.length > 1) {
-                    result += "เอ็ด";
-                } else if (pos === 1 && digit === 2) {
-                    result += "ยี่";
-                } else if (pos === 1 && digit === 1) {
-                    result += "";
-                } else {
-                    result += digitText[digit];
-                }
-
-                result += scaleText[pos];
-            }
-
-            return result;
-        }
-
-        function bahtText(value) {
-            const amount = Number(value || 0).toFixed(2);
-            if (Number(amount) === 0) {
-                return "ศูนย์บาทถ้วน";
-            }
-
-            const [integerPart, decimalPart] = amount.split(".");
-            const integerText = `${readThaiNumber(integerPart)}บาท`;
-            if (decimalPart === "00") {
-                return `${integerText}ถ้วน`;
-            }
-            return `${integerText}${readThaiNumber(decimalPart)}สตางค์`;
-        }
-
-        function calculateTotal() {
-            let total = 0;
-            document.querySelectorAll(".inst-amount").forEach((input) => {
-                total += parseFloat(input.value) || 0;
-            });
-            document.getElementById("totalAmountDisplay").textContent = formatCurrency(total);
-        }
-
-        function addInstallmentRow() {
-            const tr = document.createElement("tr");
-            tr.className = "installment-row border-b hover:bg-gray-50";
-            tr.innerHTML = `
-                <td class="px-4 py-2"><input type="number" class="inst-no w-full border px-2 py-1 rounded" placeholder="เช่น 120" required></td>
-                <td class="px-4 py-2"><input type="date" class="inst-date w-full border px-2 py-1 rounded" required></td>
-                <td class="px-4 py-2"><input type="number" class="inst-amount w-full border px-2 py-1 rounded text-right" value="30" min="1" step="0.01" required></td>
-                <td class="px-4 py-2 text-center"><button type="button" class="text-red-500 hover:text-red-700 font-bold delete-row-btn">X</button></td>
-            `;
-            tableBody.appendChild(tr);
-
-            tr.querySelector(".inst-amount").addEventListener("input", calculateTotal);
-            tr.querySelector(".delete-row-btn").addEventListener("click", () => {
-                tr.remove();
-                calculateTotal();
-            });
-
-            calculateTotal();
-        }
-
-        function validateMemberSelection() {
-            if (memberIdInput.value) {
-                memberIdInput.setCustomValidity("");
-                return true;
-            }
-
-            if (!memberSearchInput.value.trim()) {
-                memberIdInput.setCustomValidity("กรุณาเลือกสมาชิก");
-            } else {
-                memberIdInput.setCustomValidity("กรุณาเลือกรายชื่อสมาชิกจากรายการค้นหา");
-            }
-
-            memberIdInput.reportValidity();
-            return false;
-        }
-
-        function renderMemberOptions() {
-            const searchValue = memberSearchInput.value.trim().toLowerCase();
-            filteredMemberOptions = memberOptions.filter((member) => member.searchText.includes(searchValue));
-            memberDropdown.innerHTML = "";
-
-            if (!memberOptions.length) {
-                memberDropdown.classList.add("hidden");
-                return;
-            }
-
-            if (!filteredMemberOptions.length) {
-                memberDropdown.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500">ไม่พบรายชื่อสมาชิก</div>';
-                memberDropdown.classList.remove("hidden");
-                return;
-            }
-
-            filteredMemberOptions.forEach((member) => {
-                const option = document.createElement("button");
-                option.type = "button";
-                option.className = "w-full px-4 py-2 text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none";
-                option.innerHTML = escapeHtml(member.label);
-                option.addEventListener("click", () => {
-                    selectedMember = member;
-                    memberIdInput.value = member.id;
-                    memberSearchInput.value = member.label;
-                    memberDropdown.classList.add("hidden");
+                this.setUserDisplay('displayUserName', (currentUser) => {
+                    const roleMap = { superadmin: 'Super Admin', admin: 'Admin', officer: 'เจ้าหน้าที่' };
+                    return `${currentUser.full_name || '-'}<br><span class="text-xs text-blue-300">(${roleMap[currentUser.role] || 'เจ้าหน้าที่'})</span>`;
                 });
-                memberDropdown.appendChild(option);
-            });
 
-            memberDropdown.classList.remove("hidden");
-        }
-
-        function setupMemberDropdown() {
-            memberSearchInput.addEventListener("input", () => {
-                memberIdInput.value = "";
-                selectedMember = null;
-                renderMemberOptions();
-            });
-
-            memberSearchInput.addEventListener("focus", renderMemberOptions);
-
-            document.addEventListener("click", (event) => {
-                if (!memberDropdown.parentElement.contains(event.target)) {
-                    memberDropdown.classList.add("hidden");
-                }
-            });
-        }
-
-        function getInstallmentsFromForm() {
-            const installments = [];
-            document.querySelectorAll(".installment-row").forEach((row) => {
-                installments.push({
-                    installment_no: row.querySelector(".inst-no").value,
-                    period_date: row.querySelector(".inst-date").value,
-                    amount: row.querySelector(".inst-amount").value
-                });
-            });
-            return installments;
-        }
-
-        function getInstallmentSummary(installments) {
-            const installmentNos = installments
-                .map((item) => Number(item.installment_no))
-                .filter((item) => !Number.isNaN(item))
-                .sort((a, b) => a - b);
-
-            const dates = installments
-                .map((item) => item.period_date)
-                .filter(Boolean)
-                .sort((a, b) => new Date(a) - new Date(b));
-
-            const totalAmount = installments.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
-            const firstAmount = installments.length ? (parseFloat(installments[0].amount) || 0) : 0;
-
-            const installmentRange = installmentNos.length
-                ? (installmentNos[0] === installmentNos[installmentNos.length - 1]
-                    ? `${installmentNos[0]}`
-                    : `${installmentNos[0]} - ${installmentNos[installmentNos.length - 1]}`)
-                : "-";
-
-            const periodRange = dates.length
-                ? (dates[0] === dates[dates.length - 1]
-                    ? formatThaiLongDate(dates[0])
-                    : `${formatThaiLongDate(dates[0])} - ${formatThaiLongDate(dates[dates.length - 1])}`)
-                : "-";
-
-            return {
-                installmentRange,
-                periodRange,
-                count: installments.length,
-                amountPerInstallment: firstAmount,
-                totalAmount
-            };
-        }
-
-        function fillReceiptPdf(data) {
-            const summary = getInstallmentSummary(data.installments);
-            document.getElementById("pdfReceiptNo").textContent = data.receipt_no || "-";
-            document.getElementById("pdfMemberName").textContent = data.member_name || "-";
-            document.getElementById("pdfReceiptDate").textContent = formatThaiDate(data.receipt_date);
-            document.getElementById("pdfInstallmentNos").textContent = summary.installmentRange;
-            document.getElementById("pdfPeriodRange").textContent = summary.periodRange;
-            document.getElementById("pdfInstallmentCount").textContent = summary.count;
-            document.getElementById("pdfAmountPerInstallment").textContent = formatCurrency(summary.amountPerInstallment);
-            document.getElementById("pdfTotalAmount").textContent = formatCurrency(summary.totalAmount);
-            document.getElementById("pdfTotalAmountFooter").textContent = formatCurrency(summary.totalAmount);
-            document.getElementById("pdfAmountText").textContent = `(${bahtText(summary.totalAmount)})`;
-            document.getElementById("pdfPrintedBy").textContent = data.printed_by || "-";
-            document.getElementById("pdfPrintedAt").textContent = formatThaiDateTime(new Date());
-            document.getElementById("pdfSignerName").textContent = data.printed_by || "";
-        }
-
-        function printReceiptFromPage(data) {
-            fillReceiptPdf(data);
-            reloadAfterPrint = true;
-            window.print();
-        }
-
-        async function loadInitialData() {
-            document.getElementById("receipt_date").value = new Date().toISOString().split("T")[0];
-            addInstallmentRow();
-            setupMemberDropdown();
-
-            try {
-                const receiptRes = await fetch("http://localhost:8000/api/utils/next-number/receipt");
-                const receiptData = await receiptRes.json();
-                if (receiptData.status === "success") {
-                    currentReceiptNo = receiptData.next_number;
-                    document.getElementById("receipt_no_display").textContent = currentReceiptNo;
-                }
-            } catch (error) {
-                document.getElementById("receipt_no_display").textContent = "เชื่อมต่อ API ไม่ได้";
+                this.bindLogoutButton();
+                this.applyRoleVisibility();
+                this.bindEvents();
+                this.loadInitialData();
             }
 
-            try {
-                const memberRes = await fetch("http://localhost:8000/api/members");
-                const memberData = await memberRes.json();
-                if (memberData.status === "success") {
-                    memberOptions = memberData.data.map((member) => ({
+            applyRoleVisibility() {
+                if (this.user.role === 'officer') this.getElement('menu-reports').style.display = 'none';
+                if (this.user.role !== 'superadmin') this.getElement('menu-settings').style.display = 'none';
+            }
+
+            bindEvents() {
+                this.getElement('addRowBtn').addEventListener('click', () => this.addInstallmentRow());
+                this.getElement('receiptForm').addEventListener('submit', (event) => this.handleSubmit(event));
+                this.getElement('member_search').addEventListener('input', () => this.handleMemberSearch());
+                this.getElement('member_search').addEventListener('focus', () => this.renderMemberOptions());
+                document.addEventListener('click', (event) => this.handleOutsideDropdown(event));
+                window.addEventListener('afterprint', () => {
+                    if (this.reloadAfterPrint) window.location.reload();
+                });
+            }
+
+            async loadInitialData() {
+                this.getElement('receipt_date').value = new Date().toISOString().split('T')[0];
+                this.addInstallmentRow();
+                await Promise.all([this.loadReceiptNumber(), this.loadMembers()]);
+            }
+
+            async loadReceiptNumber() {
+                try {
+                    const result = await this.api.get('/utils/next-number/receipt');
+                    this.currentReceiptNo = result.next_number || '';
+                    this.getElement('receipt_no_display').textContent = this.currentReceiptNo;
+                } catch (error) {
+                    this.getElement('receipt_no_display').textContent = 'เชื่อมต่อ API ไม่ได้';
+                }
+            }
+
+            async loadMembers() {
+                try {
+                    const result = await this.api.get('/members');
+                    this.memberOptions = result.data.map((member) => ({
                         id: member.id,
                         member_code: member.member_code,
-                        first_name: member.first_name,
-                        last_name: member.last_name,
                         full_name: `${member.first_name} ${member.last_name}`,
                         label: `[${member.member_code}] ${member.first_name} ${member.last_name}`,
                         searchText: `${member.member_code} ${member.first_name} ${member.last_name}`.toLowerCase()
                     }));
-                    renderMemberOptions();
+                    this.renderMemberOptions();
+                } catch (error) {
+                    this.getElement('member_helper').textContent = 'โหลดข้อมูลสมาชิกล้มเหลว';
                 }
-            } catch (error) {
-                memberHelper.textContent = "โหลดข้อมูลสมาชิกล้มเหลว";
-            }
-        }
-
-        function setupUserUI() {
-            let roleDisplay = "เจ้าหน้าที่";
-            if (user.role === "superadmin") roleDisplay = "Super Admin";
-            if (user.role === "admin") roleDisplay = "Admin";
-
-            document.getElementById("displayUserName").innerHTML = `${user.full_name || "-"} <br><span class="text-xs text-blue-300">(${roleDisplay})</span>`;
-
-            if (user.role === "officer") {
-                document.getElementById("menu-reports").style.display = "none";
-            }
-            if (user.role !== "superadmin") {
-                document.getElementById("menu-settings").style.display = "none";
-            }
-        }
-
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-            if (confirm("ต้องการออกจากระบบใช่หรือไม่?")) {
-                localStorage.removeItem("user_session");
-                window.location.href = "index.html";
-            }
-        });
-
-        addRowBtn.addEventListener("click", addInstallmentRow);
-
-        window.addEventListener("afterprint", () => {
-            if (reloadAfterPrint) {
-                window.location.reload();
-            }
-        });
-
-        document.getElementById("receiptForm").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            hideAlert();
-
-            if (!validateMemberSelection()) {
-                return;
             }
 
-            const installments = getInstallmentsFromForm();
-            if (!installments.length) {
-                alert("กรุณาเพิ่มรายการรับเงินอย่างน้อย 1 รายการ");
-                return;
-            }
+            createInstallmentRow(defaultValue = {}) {
+                const row = document.createElement('tr');
+                row.className = 'installment-row border-b last:border-b-0';
+                row.innerHTML = `
+                    <td class="px-4 py-3"><input type="number" min="1" class="inst-no w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" value="${defaultValue.installment_no || ''}" required></td>
+                    <td class="px-4 py-3"><input type="date" class="inst-date w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" value="${defaultValue.period_date || ''}" required></td>
+                    <td class="px-4 py-3"><input type="number" min="0" step="0.01" class="inst-amount w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-right" value="${defaultValue.amount || '30'}" required></td>
+                    <td class="px-4 py-3 text-center"><button type="button" class="remove-row text-red-500 hover:text-red-700 font-semibold">ลบ</button></td>
+                `;
 
-            const receiptDate = document.getElementById("receipt_date").value;
-            const memberName = selectedMember
-                ? `${selectedMember.full_name} สมาชิกเลขที่ ${selectedMember.member_code}`
-                : memberSearchInput.value.trim();
-
-            const payload = {
-                receipt_no: currentReceiptNo,
-                receipt_date: receiptDate,
-                member_id: memberIdInput.value,
-                terminal_id: document.getElementById("terminal_id").value,
-                employee_id: user.employee_id || 1,
-                installments
-            };
-
-            const pdfData = {
-                receipt_no: currentReceiptNo,
-                receipt_date: receiptDate,
-                member_name: memberName,
-                installments,
-                printed_by: user.full_name || "-"
-            };
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = "กำลังบันทึก...";
-
-            try {
-                const response = await fetch("http://localhost:8000/api/incomes/receipts", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
+                row.querySelector('.remove-row').addEventListener('click', () => {
+                    row.remove();
+                    if (!document.querySelector('.installment-row')) this.addInstallmentRow();
+                    this.updateTotalAmount();
                 });
-                const result = await response.json();
 
-                if (result.status !== "success") {
-                    throw new Error(result.message || "บันทึกข้อมูลไม่สำเร็จ");
+                row.querySelectorAll('input').forEach((input) => {
+                    input.addEventListener('input', () => this.updateTotalAmount());
+                });
+
+                return row;
+            }
+
+            addInstallmentRow(defaultValue = {}) {
+                this.getElement('installmentTableBody').appendChild(this.createInstallmentRow(defaultValue));
+                this.updateTotalAmount();
+            }
+
+            updateTotalAmount() {
+                const total = Array.from(document.querySelectorAll('.inst-amount')).reduce((sum, input) => sum + (parseFloat(input.value) || 0), 0);
+                this.getElement('totalAmountDisplay').textContent = this.formatMoney(total);
+            }
+
+            handleMemberSearch() {
+                this.getElement('member_id').value = '';
+                this.selectedMember = null;
+                this.renderMemberOptions();
+            }
+
+            handleOutsideDropdown(event) {
+                const dropdown = this.getElement('member_dropdown');
+                if (!dropdown.parentElement.contains(event.target)) dropdown.classList.add('hidden');
+            }
+
+            renderMemberOptions() {
+                const dropdown = this.getElement('member_dropdown');
+                const searchValue = this.getElement('member_search').value.trim().toLowerCase();
+                const filtered = this.memberOptions.filter((member) => member.searchText.includes(searchValue));
+                dropdown.innerHTML = '';
+
+                if (!this.memberOptions.length) {
+                    dropdown.classList.add('hidden');
+                    return;
                 }
 
-                submitBtn.textContent = "กำลังเปิดหน้าพิมพ์...";
-                printReceiptFromPage(pdfData);
-            } catch (error) {
-                showAlert(error.message || "เกิดข้อผิดพลาดระหว่างบันทึกใบเสร็จ");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = "บันทึกและออกใบเสร็จ PDF";
-            }
-        });
+                if (!filtered.length) {
+                    dropdown.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500">ไม่พบรายชื่อสมาชิก</div>';
+                    dropdown.classList.remove('hidden');
+                    return;
+                }
 
-        setupUserUI();
-        loadInitialData();
+                filtered.forEach((member) => {
+                    const option = document.createElement('button');
+                    option.type = 'button';
+                    option.className = 'w-full px-4 py-2 text-left hover:bg-blue-50 focus:bg-blue-50 focus:outline-none';
+                    option.textContent = member.label;
+                    option.addEventListener('click', () => {
+                        this.selectedMember = member;
+                        this.getElement('member_id').value = member.id;
+                        this.getElement('member_search').value = member.label;
+                        dropdown.classList.add('hidden');
+                    });
+                    dropdown.appendChild(option);
+                });
+
+                dropdown.classList.remove('hidden');
+            }
+
+            validateMemberSelection() {
+                const memberIdInput = this.getElement('member_id');
+                const memberSearchInput = this.getElement('member_search');
+
+                if (memberIdInput.value) {
+                    memberIdInput.setCustomValidity('');
+                    return true;
+                }
+
+                memberIdInput.setCustomValidity(memberSearchInput.value.trim()
+                    ? 'กรุณาเลือกรายชื่อสมาชิกจากรายการค้นหา'
+                    : 'กรุณาเลือกสมาชิก');
+                memberIdInput.reportValidity();
+                return false;
+            }
+
+            getInstallmentsFromForm() {
+                return Array.from(document.querySelectorAll('.installment-row')).map((row) => ({
+                    installment_no: row.querySelector('.inst-no').value,
+                    period_date: row.querySelector('.inst-date').value,
+                    amount: row.querySelector('.inst-amount').value
+                }));
+            }
+
+            getInstallmentSummary(installments) {
+                const installmentNos = installments.map((item) => Number(item.installment_no)).filter((item) => !Number.isNaN(item)).sort((a, b) => a - b);
+                const dates = installments.map((item) => item.period_date).filter(Boolean).sort((a, b) => new Date(a) - new Date(b));
+                const totalAmount = installments.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+                const firstAmount = installments.length ? (parseFloat(installments[0].amount) || 0) : 0;
+
+                return {
+                    installmentRange: installmentNos.length ? (installmentNos[0] === installmentNos[installmentNos.length - 1] ? `${installmentNos[0]}` : `${installmentNos[0]} - ${installmentNos[installmentNos.length - 1]}`) : '-',
+                    periodRange: dates.length ? (dates[0] === dates[dates.length - 1] ? this.formatThaiLongDate(dates[0]) : `${this.formatThaiLongDate(dates[0])} - ${this.formatThaiLongDate(dates[dates.length - 1])}`) : '-',
+                    count: installments.length,
+                    amountPerInstallment: firstAmount,
+                    totalAmount
+                };
+            }
+
+            fillReceiptPdf(data) {
+                const summary = this.getInstallmentSummary(data.installments);
+                this.getElement('pdfReceiptNo').textContent = data.receipt_no || '-';
+                this.getElement('pdfMemberName').textContent = data.member_name || '-';
+                this.getElement('pdfReceiptDate').textContent = this.formatThaiDate(data.receipt_date);
+                this.getElement('pdfInstallmentNos').textContent = summary.installmentRange;
+                this.getElement('pdfPeriodRange').textContent = summary.periodRange;
+                this.getElement('pdfInstallmentCount').textContent = summary.count;
+                this.getElement('pdfAmountPerInstallment').textContent = this.formatMoney(summary.amountPerInstallment);
+                this.getElement('pdfTotalAmount').textContent = this.formatMoney(summary.totalAmount);
+                this.getElement('pdfTotalAmountFooter').textContent = this.formatMoney(summary.totalAmount);
+                this.getElement('pdfAmountText').textContent = `(${this.bahtText(summary.totalAmount)})`;
+                this.getElement('pdfPrintedBy').textContent = data.printed_by || '-';
+                this.getElement('pdfPrintedAt').textContent = this.formatThaiDateTime(new Date());
+                this.getElement('pdfSignerName').textContent = data.printed_by || '';
+            }
+
+            async handleSubmit(event) {
+                event.preventDefault();
+                this.alertBox.hide();
+
+                if (!this.validateMemberSelection()) return;
+
+                const installments = this.getInstallmentsFromForm();
+                if (!installments.length) {
+                    window.alert('กรุณาเพิ่มรายการรับเงินอย่างน้อย 1 รายการ');
+                    return;
+                }
+
+                const restoreButton = this.withButtonLoading(this.getElement('submitBtn'), 'กำลังบันทึก...');
+                const receiptDate = this.getElement('receipt_date').value;
+                const memberName = this.selectedMember
+                    ? `${this.selectedMember.full_name} สมาชิกเลขที่ ${this.selectedMember.member_code}`
+                    : this.getElement('member_search').value.trim();
+
+                try {
+                    await this.api.post('/incomes/receipts', {
+                        receipt_no: this.currentReceiptNo,
+                        receipt_date: receiptDate,
+                        member_id: this.getElement('member_id').value,
+                        terminal_id: this.getElement('terminal_id').value,
+                        employee_id: this.user.employee_id || 1,
+                        installments
+                    });
+
+                    this.fillReceiptPdf({
+                        receipt_no: this.currentReceiptNo,
+                        receipt_date: receiptDate,
+                        member_name: memberName,
+                        installments,
+                        printed_by: this.user.full_name || '-'
+                    });
+
+                    this.reloadAfterPrint = true;
+                    this.getElement('submitBtn').textContent = 'กำลังเปิดหน้าพิมพ์...';
+                    window.print();
+                } catch (error) {
+                    restoreButton();
+                    this.alertBox.showError(error.message || 'เกิดข้อผิดพลาดระหว่างบันทึกใบเสร็จ');
+                }
+            }
+
+            formatMoney(value) {
+                return Number(value || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            formatThaiDate(value) {
+                return value ? new Date(value).toLocaleDateString('th-TH') : '-';
+            }
+
+            formatThaiLongDate(value) {
+                return value ? new Date(value).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) : '-';
+            }
+
+            formatThaiDateTime(value) {
+                return new Date(value).toLocaleString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+
+            bahtText(value) {
+                const number = parseFloat(value || 0);
+                if (!Number.isFinite(number)) return 'ศูนย์บาทถ้วน';
+
+                const digitText = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+                const unitText = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+
+                const readNumber = (numberValue) => {
+                    if (numberValue === 0) return '';
+                    const text = String(numberValue);
+                    let result = '';
+
+                    for (let index = 0; index < text.length; index += 1) {
+                        const digit = Number(text.charAt(index));
+                        const position = text.length - index - 1;
+                        if (digit === 0) continue;
+                        if (position === 0 && digit === 1 && text.length > 1) result += 'เอ็ด';
+                        else if (position === 1 && digit === 2) result += 'ยี่';
+                        else if (position === 1 && digit === 1) result += '';
+                        else result += digitText[digit];
+                        result += unitText[position];
+                    }
+
+                    return result;
+                };
+
+                const [integerPart, decimalPart = '00'] = number.toFixed(2).split('.');
+                const baht = Number(integerPart) === 0 ? 'ศูนย์บาท' : `${readNumber(Number(integerPart))}บาท`;
+                return decimalPart === '00' ? `${baht}ถ้วน` : `${baht}${readNumber(Number(decimalPart))}สตางค์`;
+            }
+        }
+
+        new ReceiptPage().init();
     </script>
 </body>
 </html>

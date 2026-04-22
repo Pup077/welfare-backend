@@ -3,29 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จัดการผู้ใช้งาน | กองทุนสวัสดิการชุมชนฯ</title>
+    <title>จัดการผู้ใช้งาน | กองทุนสวัสดิการชุมชน</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <style> body { font-family: 'Prompt', sans-serif; } </style>
-    <script>
-        // 🛡️ ป้องกันขั้นสูงสุด: ต้องเป็น Super Admin เท่านั้นถึงเข้าหน้านี้ได้
-        const userSession = localStorage.getItem('user_session');
-        if (!userSession) {
-            window.location.href = 'index.html';
-        } else {
-            const user = JSON.parse(userSession);
-            if (user.role !== 'superadmin') {
-                alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้ (เฉพาะ Super Admin เท่านั้น)');
-                window.location.href = 'dashboard.html';
-            }
-        }
-    </script>
+    <script src="services/frontend.js"></script>
 </head>
 <body class="bg-gray-100 flex h-screen overflow-hidden">
 
     <aside class="w-64 bg-blue-800 text-white flex flex-col shadow-lg z-10 shrink-0">
         <div class="p-6 text-center border-b border-blue-700">
-            <h1 class="text-xl font-bold">กองทุนสวัสดิการฯ</h1>
+            <h1 class="text-xl font-bold">กองทุนสวัสดิการชุมชน</h1>
             <p class="text-xs text-blue-300 mt-1">เทศบาลนครนครศรีธรรมราช</p>
         </div>
         <nav class="flex-grow p-4 space-y-2">
@@ -33,9 +21,8 @@
             <a href="members.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">👥 จัดการสมาชิก</a>
             <a href="receipt.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">💰 รับเงินสมทบ</a>
             <a href="expense.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">💸 จ่ายสวัสดิการ</a>
-            <a href="reports.html" id="menu-reports" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">📊 รายงาน</a>
-            
-            <a href="manage-users.html" id="menu-settings" class="block w-full text-left px-4 py-3 bg-blue-900 hover:bg-blue-700 rounded-lg transition font-semibold text-yellow-300">⚙️ จัดการผู้ใช้งาน</a>
+            <a href="reports.html" class="block w-full text-left px-4 py-3 hover:bg-blue-700 rounded-lg transition">📊 รายงาน</a>
+            <a href="manage-users.html" class="block w-full text-left px-4 py-3 bg-blue-900 hover:bg-blue-700 rounded-lg transition font-semibold text-yellow-300">⚙️ จัดการผู้ใช้งาน</a>
         </nav>
         <div class="p-4 border-t border-blue-700 text-sm bg-blue-900">
             <p class="mb-2 text-gray-300">ผู้ใช้งาน: <br><span id="displayUserName" class="font-bold text-green-400 text-base">Loading...</span></p>
@@ -44,14 +31,14 @@
     </aside>
 
     <main class="flex-1 p-8 overflow-y-auto w-full">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">ตั้งค่าผู้ใช้งานระบบ (User Management)</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">ตั้งค่าผู้ใช้งานระบบ</h2>
 
         <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-yellow-400 mb-8 max-w-5xl">
-            <h3 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">+ สร้างบัญชีผู้ใช้งานใหม่</h3>
+            <h3 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">สร้างบัญชีผู้ใช้งานใหม่</h3>
             <form id="createUserForm" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">รหัสพนักงาน (ใช้เข้าสู่ระบบ) *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">รหัสพนักงาน *</label>
                         <input type="text" id="emp_code" required placeholder="เช่น EMP001" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
@@ -60,20 +47,20 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">ตำแหน่ง *</label>
-                        <input type="text" id="position" required placeholder="เช่น เจ้าหน้าที่กองทุนฯ" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="position" required placeholder="เช่น เจ้าหน้าที่กองทุน" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div class="lg:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">สิทธิ์การใช้งาน (Role) *</label>
                         <select id="role" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 font-semibold text-blue-700">
-                            <option value="officer">เจ้าหน้าที่ทั่วไป (ทำรายการรับ-จ่ายได้ / ดูรายงานไม่ได้)</option>
-                            <option value="admin">Admin (ทำรายการได้ / ดูรายงานได้)</option>
-                            <option value="superadmin">Super Admin (เข้าถึงได้ทุกเมนู / จัดการสิทธิ์ได้)</option>
+                            <option value="officer">เจ้าหน้าที่ทั่วไป</option>
+                            <option value="admin">Admin</option>
+                            <option value="superadmin">Super Admin</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ตั้งรหัสผ่านชั่วคราว *</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่านชั่วคราว *</label>
                         <input type="text" id="password" required value="123456" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-yellow-50 text-gray-600">
-                        <p class="text-xs text-gray-400 mt-1">แนะนำให้ใช้ 123456 เบื้องต้น</p>
+                        <p class="text-xs text-gray-400 mt-1">ค่าเริ่มต้นคือ 123456</p>
                     </div>
                 </div>
                 <div class="flex justify-end pt-4">
@@ -87,16 +74,16 @@
 
         <div class="bg-white rounded-xl shadow-md overflow-hidden max-w-5xl">
             <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
-                <h3 class="font-bold text-gray-700">รายชื่อผู้ใช้งานในระบบทั้งหมด</h3>
-                <button onclick="loadUsers()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded transition">รีเฟรชข้อมูล</button>
+                <h3 class="font-bold text-gray-700">รายชื่อผู้ใช้งานทั้งหมด</h3>
+                <button id="reloadUsersBtn" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded transition">รีเฟรชข้อมูล</button>
             </div>
             <table class="min-w-full text-left border-collapse">
                 <thead class="bg-blue-50 text-blue-800 border-b border-blue-100">
                     <tr>
-                        <th class="px-6 py-3 font-semibold">รหัสเจ้าหน้าที่</th>
+                        <th class="px-6 py-3 font-semibold">รหัสพนักงาน</th>
                         <th class="px-6 py-3 font-semibold">ชื่อ - นามสกุล</th>
                         <th class="px-6 py-3 font-semibold">ตำแหน่ง</th>
-                        <th class="px-6 py-3 font-semibold">ระดับสิทธิ์ (Role)</th>
+                        <th class="px-6 py-3 font-semibold">สิทธิ์</th>
                         <th class="px-6 py-3 font-semibold text-center">จัดการ</th>
                     </tr>
                 </thead>
@@ -108,115 +95,107 @@
     </main>
 
     <script>
-        // --- 1. จัดการแสดงผลชื่อและสิทธิ์ที่มุมซ้ายล่าง ---
-        const user = JSON.parse(userSession);
-        let roleDisplay = "เจ้าหน้าที่";
-        if(user.role === 'superadmin') roleDisplay = "Super Admin";
-        if(user.role === 'admin') roleDisplay = "Admin";
-        
-        document.getElementById('displayUserName').innerHTML = `${user.full_name} <br><span class="text-xs text-yellow-300">(${roleDisplay})</span>`;
-
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if(confirm('ต้องการออกจากระบบใช่หรือไม่?')) { 
-                localStorage.removeItem('user_session'); 
-                window.location.href = 'index.html'; 
+        class UserManagementPage extends WelfareApp.BasePage {
+            constructor() {
+                super();
+                this.form = this.getElement('createUserForm');
+                this.submitButton = this.getElement('submitBtn');
+                this.userTableBody = this.getElement('userTableBody');
+                this.alertBox = new WelfareApp.AlertBoxController(this.getElement('alertBox'));
             }
-        });
 
-        // --- 2. ดึงข้อมูลผู้ใช้งานมาแสดงในตาราง ---
-        async function loadUsers() {
-            const tbody = document.getElementById('userTableBody');
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-400">กำลังโหลด...</td></tr>';
-            try {
-                const res = await fetch('http://localhost:8000/api/users');
-                const result = await res.json();
-                
-                if (result.status === 'success') {
-                    tbody.innerHTML = '';
-                    result.data.forEach(u => {
-                        // กำหนดสีของป้ายสิทธิ์
-                        let roleColor = 'bg-gray-100 text-gray-800';
-                        let roleText = 'เจ้าหน้าที่ทั่วไป';
-                        
-                        if (u.role === 'superadmin') {
-                            roleColor = 'bg-red-100 text-red-800 border border-red-200';
-                            roleText = '⭐ Super Admin';
-                        } else if (u.role === 'admin') {
-                            roleColor = 'bg-blue-100 text-blue-800 border border-blue-200';
-                            roleText = '🛡️ Admin';
-                        }
-
-                        tbody.innerHTML += `
-                            <tr class="border-b hover:bg-gray-50 transition">
-                                <td class="px-6 py-4 font-bold text-blue-600">${u.emp_code}</td>
-                                <td class="px-6 py-4">${u.full_name}</td>
-                                <td class="px-6 py-4 text-sm text-gray-500">${u.position}</td>
-                                <td class="px-6 py-4">
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold ${roleColor}">${roleText}</span>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <button class="text-gray-400 hover:text-gray-600 text-sm underline cursor-not-allowed" title="รออัปเดตฟีเจอร์นี้">แก้ไข</button>
-                                </td>
-                            </tr>
-                        `;
-                    });
+            init() {
+                const user = this.session.requireRole('superadmin');
+                if (!user) {
+                    return;
                 }
-            } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-red-500">เชื่อมต่อเซิร์ฟเวอร์ล้มเหลว</td></tr>';
+
+                this.setUserDisplay('displayUserName', (currentUser) => {
+                    return `${currentUser.full_name} <br><span class="text-xs text-yellow-300">(Super Admin)</span>`;
+                });
+
+                this.bindLogoutButton();
+                this.form.addEventListener('submit', (event) => this.handleCreateUser(event));
+                this.getElement('reloadUsersBtn').addEventListener('click', () => this.loadUsers());
+                this.loadUsers();
+            }
+
+            async loadUsers() {
+                this.userTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-400">กำลังโหลดข้อมูล...</td></tr>';
+
+                try {
+                    const result = await this.api.get('/users');
+                    this.userTableBody.innerHTML = result.data.map((user) => this.createUserRow(user)).join('');
+                } catch (error) {
+                    this.userTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-red-500">เชื่อมต่อเซิร์ฟเวอร์ล้มเหลว</td></tr>';
+                }
+            }
+
+            createUserRow(user) {
+                const roleConfig = this.getRoleConfig(user.role);
+
+                return `
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 font-bold text-blue-600">${user.emp_code}</td>
+                        <td class="px-6 py-4">${user.full_name}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">${user.position || '-'}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${roleConfig.className}">${roleConfig.label}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button class="text-gray-400 text-sm underline cursor-not-allowed" title="ยังไม่ได้เปิดฟังก์ชันแก้ไข">แก้ไข</button>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            getRoleConfig(role) {
+                const roleMap = {
+                    superadmin: {
+                        label: 'Super Admin',
+                        className: 'bg-red-100 text-red-800 border border-red-200'
+                    },
+                    admin: {
+                        label: 'Admin',
+                        className: 'bg-blue-100 text-blue-800 border border-blue-200'
+                    },
+                    officer: {
+                        label: 'เจ้าหน้าที่ทั่วไป',
+                        className: 'bg-gray-100 text-gray-800'
+                    }
+                };
+
+                return roleMap[role] || roleMap.officer;
+            }
+
+            // แยกขั้นตอนสร้างผู้ใช้งานออกมาให้แต่ละหน้าที่ชัดเจนและแก้ง่าย
+            async handleCreateUser(event) {
+                event.preventDefault();
+                const restoreButton = this.withButtonLoading(this.submitButton, 'กำลังสร้าง...');
+                this.alertBox.hide();
+
+                try {
+                    await this.api.post('/auth/register', {
+                        emp_code: this.getElement('emp_code').value,
+                        full_name: this.getElement('full_name').value,
+                        position: this.getElement('position').value,
+                        role: this.getElement('role').value,
+                        password: this.getElement('password').value
+                    });
+
+                    this.alertBox.showSuccess('สร้างบัญชีผู้ใช้งานใหม่สำเร็จ');
+                    this.form.reset();
+                    this.getElement('password').value = '123456';
+                    await this.loadUsers();
+                } catch (error) {
+                    this.alertBox.showError(error.message);
+                } finally {
+                    restoreButton();
+                }
             }
         }
-        
-        // สั่งโหลดตารางทันทีที่เปิดหน้า
-        document.addEventListener('DOMContentLoaded', loadUsers);
 
-        // --- 3. ระบบส่งฟอร์มสร้างผู้ใช้ใหม่ ---
-        document.getElementById('createUserForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtn = document.getElementById('submitBtn');
-            const alertBox = document.getElementById('alertBox');
-            
-            submitBtn.textContent = "กำลังสร้าง..."; 
-            submitBtn.disabled = true; 
-            alertBox.classList.add('hidden');
-
-            const payload = {
-                emp_code: document.getElementById('emp_code').value,
-                full_name: document.getElementById('full_name').value,
-                position: document.getElementById('position').value,
-                role: document.getElementById('role').value,
-                password: document.getElementById('password').value
-            };
-
-            try {
-                const response = await fetch('http://localhost:8000/api/auth/register', {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(payload)
-                });
-                
-                const result = await response.json();
-                
-                if (result.status === 'success') {
-                    alertBox.textContent = "สร้างบัญชีผู้ใช้งานใหม่สำเร็จ!";
-                    alertBox.className = "mt-4 px-4 py-3 rounded-lg text-sm text-center font-bold bg-green-100 text-green-800";
-                    alertBox.classList.remove('hidden');
-                    
-                    // ล้างข้อมูลในฟอร์ม และรีโหลดตารางใหม่
-                    document.getElementById('createUserForm').reset();
-                    document.getElementById('password').value = "123456"; 
-                    loadUsers(); 
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                alertBox.textContent = error.message;
-                alertBox.className = "mt-4 px-4 py-3 rounded-lg text-sm text-center font-bold bg-red-100 text-red-700";
-                alertBox.classList.remove('hidden');
-            } finally {
-                submitBtn.textContent = "บันทึกสร้างบัญชี"; 
-                submitBtn.disabled = false;
-            }
-        });
+        new UserManagementPage().init();
     </script>
 </body>
 </html>

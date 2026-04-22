@@ -7,17 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <style> body { font-family: 'Prompt', sans-serif; } </style>
-    
-    <script>
-        const userSession = localStorage.getItem('user_session');
-        if (!userSession) window.location.href = 'index.html';
-    </script>
+    <script src="services/frontend.js"></script>
 </head>
 <body class="bg-gray-100 flex h-screen overflow-hidden">
 
     <aside class="w-64 bg-blue-800 text-white flex flex-col shadow-lg z-10 shrink-0">
         <div class="p-6 text-center border-b border-blue-700">
-            <h1 class="text-xl font-bold">กองทุนสวัสดิการฯ</h1>
+            <h1 class="text-xl font-bold">กองทุนสวัสดิการชุมชน</h1>
             <p class="text-xs text-blue-300 mt-1">เทศบาลนครนครศรีธรรมราช</p>
         </div>
         <nav class="flex-grow p-4 space-y-2">
@@ -46,7 +42,7 @@
                 <p id="totalMembers" class="text-3xl font-bold text-green-600 mt-2">- คน</p>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500">
-                <h3 class="text-gray-500 text-sm font-semibold">สมาชิกค้างชำระ (> 3 งวด)</h3>
+                <h3 class="text-gray-500 text-sm font-semibold">สมาชิกค้างชำระมากกว่า 3 งวด</h3>
                 <p id="overdueMembers" class="text-3xl font-bold text-red-600 mt-2">- คน</p>
             </div>
         </div>
@@ -58,26 +54,26 @@
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 <div class="rounded-lg border border-blue-100 bg-blue-50 px-4 py-4">
                     <p class="text-xs font-semibold text-blue-700">วันนี้</p>
-                    <p id="todayIncome" class="text-2xl font-bold text-blue-800 mt-2">0.00 ฿</p>
+                    <p id="todayIncome" class="text-2xl font-bold text-blue-800 mt-2">0.00 บาท</p>
                 </div>
                 <div class="rounded-lg border border-cyan-100 bg-cyan-50 px-4 py-4">
                     <p class="text-xs font-semibold text-cyan-700">รายสัปดาห์</p>
-                    <p id="weekIncome" class="text-2xl font-bold text-cyan-800 mt-2">0.00 ฿</p>
+                    <p id="weekIncome" class="text-2xl font-bold text-cyan-800 mt-2">0.00 บาท</p>
                 </div>
                 <div class="rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-4">
                     <p class="text-xs font-semibold text-indigo-700">รายเดือน</p>
-                    <p id="monthIncome" class="text-2xl font-bold text-indigo-800 mt-2">0.00 ฿</p>
+                    <p id="monthIncome" class="text-2xl font-bold text-indigo-800 mt-2">0.00 บาท</p>
                 </div>
                 <div class="rounded-lg border border-violet-100 bg-violet-50 px-4 py-4">
                     <p class="text-xs font-semibold text-violet-700">รายปี</p>
-                    <p id="yearIncome" class="text-2xl font-bold text-violet-800 mt-2">0.00 ฿</p>
+                    <p id="yearIncome" class="text-2xl font-bold text-violet-800 mt-2">0.00 บาท</p>
                 </div>
             </div>
         </section>
         <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mt-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-bold text-gray-800">ยอดสมาชิกค้างชำระ</h3>
-                <p class="text-sm text-gray-500">สรุปตามวันที่เริ่มค้างชำระ</p>
+                <p class="text-sm text-gray-500">สรุปตามช่วงเวลาที่เริ่มค้างชำระ</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 <div class="rounded-lg border border-red-100 bg-red-50 px-4 py-4">
@@ -101,65 +97,91 @@
     </main>
 
     <script>
-        // โชว์ชื่อคนล็อกอินและระบบออกจากระบบ
-        if(userSession) document.getElementById('displayUserName').textContent = JSON.parse(userSession).full_name;
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if(confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
-                localStorage.removeItem('user_session');
-                window.location.href = 'index.html';
+        class DashboardPage extends WelfareApp.BasePage {
+            constructor() {
+                super();
+                this.reportFields = {
+                    todayIncome: 'todayIncome',
+                    weekIncome: 'weekIncome',
+                    monthIncome: 'monthIncome',
+                    yearIncome: 'yearIncome',
+                    totalMembers: 'totalMembers',
+                    overdueMembers: 'overdueMembers',
+                    overdueDayCount: 'overdueDayCount',
+                    overdueWeekCount: 'overdueWeekCount',
+                    overdueMonthCount: 'overdueMonthCount',
+                    overdueYearCount: 'overdueYearCount'
+                };
             }
-        });
-        document.getElementById('refreshDashboardBtn').addEventListener('click', async () => {
-            const refreshBtn = document.getElementById('refreshDashboardBtn');
-            refreshBtn.disabled = true;
-            refreshBtn.textContent = 'กำลังรีเฟรช...';
-            try {
-                await loadDashboardStats();
-            } finally {
-                refreshBtn.disabled = false;
-                refreshBtn.textContent = 'รีเฟรชข้อมูล';
-            }
-        });
 
-        // ดึงข้อมูลจริงจาก API มาโชว์
-        async function loadDashboardStats() {
-            try {
-                const today = new Date().toISOString().split('T')[0];
-                const incomeRes = await fetch(`http://localhost:8000/api/reports/daily-income?date=${today}`);
-                const incomeData = await incomeRes.json();
-                if(incomeData.status === 'success') document.getElementById('todayIncome').textContent = incomeData.summary.total_amount.toLocaleString() + ' ฿';
-
-                const weeklyIncomeRes = await fetch('http://localhost:8000/api/reports/weekly-income');
-                const weeklyIncomeData = await weeklyIncomeRes.json();
-                if(weeklyIncomeData.status === 'success') document.getElementById('weekIncome').textContent = weeklyIncomeData.summary.total_amount.toLocaleString() + ' ฿';
-
-                const monthlyIncomeRes = await fetch('http://localhost:8000/api/reports/monthly-income');
-                const monthlyIncomeData = await monthlyIncomeRes.json();
-                if(monthlyIncomeData.status === 'success') document.getElementById('monthIncome').textContent = monthlyIncomeData.summary.total_amount.toLocaleString() + ' ฿';
-
-                const yearlyIncomeRes = await fetch('http://localhost:8000/api/reports/yearly-income');
-                const yearlyIncomeData = await yearlyIncomeRes.json();
-                if(yearlyIncomeData.status === 'success') document.getElementById('yearIncome').textContent = yearlyIncomeData.summary.total_amount.toLocaleString() + ' ฿';
-
-                const memberRes = await fetch('http://localhost:8000/api/members');
-                const memberData = await memberRes.json();
-                if(memberData.status === 'success') document.getElementById('totalMembers').textContent = memberData.data.length + ' คน';
-
-                const overdueRes = await fetch('http://localhost:8000/api/reports/overdue');
-                const overdueData = await overdueRes.json();
-                if(overdueData.status === 'success') document.getElementById('overdueMembers').textContent = overdueData.total_overdue_members + ' คน';
-
-                const overdueSummaryRes = await fetch('http://localhost:8000/api/reports/overdue-summary');
-                const overdueSummaryData = await overdueSummaryRes.json();
-                if(overdueSummaryData.status === 'success') {
-                    document.getElementById('overdueDayCount').textContent = overdueSummaryData.summary.daily_count.toLocaleString() + ' คน';
-                    document.getElementById('overdueWeekCount').textContent = overdueSummaryData.summary.weekly_count.toLocaleString() + ' คน';
-                    document.getElementById('overdueMonthCount').textContent = overdueSummaryData.summary.monthly_count.toLocaleString() + ' คน';
-                    document.getElementById('overdueYearCount').textContent = overdueSummaryData.summary.yearly_count.toLocaleString() + ' คน';
+            init() {
+                const user = this.session.requireLogin();
+                if (!user) {
+                    return;
                 }
-            } catch (error) { console.error('โหลดข้อมูลไม่สำเร็จ'); }
+
+                this.setUserDisplay();
+                this.bindLogoutButton();
+                this.bindRefreshButton();
+                this.loadDashboardStats();
+            }
+
+            bindRefreshButton() {
+                const button = this.getElement('refreshDashboardBtn');
+
+                button.addEventListener('click', async () => {
+                    const restoreButton = this.withButtonLoading(button, 'กำลังรีเฟรช...');
+                    try {
+                        await this.loadDashboardStats();
+                    } finally {
+                        restoreButton();
+                    }
+                });
+            }
+
+            // โหลดข้อมูลสรุปทั้งหมดพร้อมกันเพื่อลดเวลารอของผู้ใช้
+            async loadDashboardStats() {
+                try {
+                    const today = new Date().toISOString().split('T')[0];
+                    const [
+                        dailyIncome,
+                        weeklyIncome,
+                        monthlyIncome,
+                        yearlyIncome,
+                        members,
+                        overdueMembers,
+                        overdueSummary
+                    ] = await Promise.all([
+                        this.api.get(`/reports/daily-income?date=${today}`),
+                        this.api.get('/reports/weekly-income'),
+                        this.api.get('/reports/monthly-income'),
+                        this.api.get('/reports/yearly-income'),
+                        this.api.get('/members'),
+                        this.api.get('/reports/overdue'),
+                        this.api.get('/reports/overdue-summary')
+                    ]);
+
+                    this.updateText(this.reportFields.todayIncome, this.formatCurrency(dailyIncome.summary.total_amount));
+                    this.updateText(this.reportFields.weekIncome, this.formatCurrency(weeklyIncome.summary.total_amount));
+                    this.updateText(this.reportFields.monthIncome, this.formatCurrency(monthlyIncome.summary.total_amount));
+                    this.updateText(this.reportFields.yearIncome, this.formatCurrency(yearlyIncome.summary.total_amount));
+                    this.updateText(this.reportFields.totalMembers, this.formatCount(members.data.length));
+                    this.updateText(this.reportFields.overdueMembers, this.formatCount(overdueMembers.total_overdue_members));
+                    this.updateText(this.reportFields.overdueDayCount, this.formatCount(overdueSummary.summary.daily_count));
+                    this.updateText(this.reportFields.overdueWeekCount, this.formatCount(overdueSummary.summary.weekly_count));
+                    this.updateText(this.reportFields.overdueMonthCount, this.formatCount(overdueSummary.summary.monthly_count));
+                    this.updateText(this.reportFields.overdueYearCount, this.formatCount(overdueSummary.summary.yearly_count));
+                } catch (error) {
+                    console.error('โหลดข้อมูลแดชบอร์ดไม่สำเร็จ', error);
+                }
+            }
+
+            updateText(elementId, value) {
+                this.getElement(elementId).textContent = value;
+            }
         }
-        loadDashboardStats();
+
+        new DashboardPage().init();
     </script>
 </body>
 </html>

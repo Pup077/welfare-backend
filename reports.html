@@ -7,14 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: "Prompt", sans-serif;
-        }
-
-        .income-report-print-stage {
-            display: none;
-        }
-
+        body { font-family: "Prompt", sans-serif; }
+        .income-report-print-stage,
+        .receipt-print-stage { display: none; }
         .income-report-page {
             width: 1120px;
             min-height: 794px;
@@ -25,14 +20,7 @@
             font-family: "TH Sarabun New", "Sarabun", Tahoma, sans-serif;
             box-sizing: border-box;
         }
-
-        .income-report-org {
-            text-align: center;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 14px;
-        }
-
+        .income-report-org { text-align: center; font-size: 22px; font-weight: 700; margin-bottom: 14px; }
         .income-report-title-box {
             border: 1px solid #222;
             display: grid;
@@ -41,64 +29,17 @@
             min-height: 44px;
             margin-bottom: 14px;
         }
-
-        .income-report-title {
-            text-align: center;
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .income-report-page-no {
-            border-left: 1px solid #222;
-            text-align: center;
-            font-size: 18px;
-            font-weight: 700;
-            padding: 8px;
-        }
-
-        .income-report-date-range {
-            text-align: center;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 14px;
-        }
-
-        .income-report-table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-            font-size: 18px;
-        }
-
+        .income-report-title { text-align: center; font-size: 22px; font-weight: 700; }
+        .income-report-page-no { border-left: 1px solid #222; text-align: center; font-size: 18px; font-weight: 700; padding: 8px; }
+        .income-report-date-range { text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+        .income-report-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 18px; }
         .income-report-table th,
-        .income-report-table td {
-            padding: 7px 8px;
-            vertical-align: middle;
-        }
-
-        .income-report-table thead th {
-            border-top: 1px solid #222;
-            border-bottom: 1px solid #222;
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .income-report-table tbody td {
-            border-bottom: 1px solid #ececec;
-        }
-
-        .income-report-center {
-            text-align: center;
-        }
-
-        .income-report-left {
-            text-align: left;
-        }
-
-        .income-report-right {
-            text-align: right;
-        }
-
+        .income-report-table td { padding: 7px 8px; vertical-align: middle; }
+        .income-report-table thead th { border-top: 1px solid #222; border-bottom: 1px solid #222; font-weight: 700; text-align: center; }
+        .income-report-table tbody td { border-bottom: 1px solid #ececec; }
+        .income-report-center { text-align: center; }
+        .income-report-left { text-align: left; }
+        .income-report-right { text-align: right; }
         .income-report-summary {
             display: flex;
             justify-content: space-between;
@@ -108,7 +49,6 @@
             font-size: 20px;
             font-weight: 700;
         }
-
         .receipt-history-modal {
             position: fixed;
             inset: 0;
@@ -119,11 +59,7 @@
             z-index: 60;
             padding: 24px;
         }
-
-        .receipt-history-modal.show {
-            display: flex;
-        }
-
+        .receipt-history-modal.show { display: flex; }
         .receipt-history-card {
             width: min(760px, 100%);
             max-height: 85vh;
@@ -133,11 +69,6 @@
             box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
             padding: 24px;
         }
-
-        .receipt-print-stage {
-            display: none;
-        }
-
         .receipt-pdf-sheet {
             width: 1123px;
             min-height: 794px;
@@ -149,35 +80,11 @@
             line-height: 1.35;
             box-sizing: border-box;
         }
-
-        .receipt-pdf-sheet * {
-            box-sizing: border-box;
-        }
-
-        .receipt-pdf-header {
-            position: relative;
-            text-align: center;
-            margin-bottom: 22px;
-        }
-
-        .receipt-pdf-number {
-            position: absolute;
-            right: 0;
-            top: 0;
-            min-width: 180px;
-            text-align: left;
-        }
-
-        .receipt-pdf-title {
-            margin: 0;
-            font-size: 23px;
-        }
-
-        .receipt-pdf-subtitle {
-            margin: 4px 0 0;
-            font-size: 21px;
-        }
-
+        .receipt-pdf-sheet * { box-sizing: border-box; }
+        .receipt-pdf-header { position: relative; text-align: center; margin-bottom: 22px; }
+        .receipt-pdf-number { position: absolute; right: 0; top: 0; min-width: 180px; text-align: left; }
+        .receipt-pdf-title { margin: 0; font-size: 23px; }
+        .receipt-pdf-subtitle { margin: 4px 0 0; font-size: 21px; }
         .receipt-pdf-meta {
             display: flex;
             justify-content: space-between;
@@ -186,30 +93,22 @@
             margin-bottom: 10px;
             font-size: 19px;
         }
-
         .receipt-pdf-table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
             border: 1px solid #444;
         }
-
         .receipt-pdf-table th,
         .receipt-pdf-table td {
             border: 1px solid #444;
             padding: 8px 10px;
             vertical-align: top;
         }
-
-        .receipt-pdf-table th {
-            font-weight: 700;
-            text-align: center;
-        }
-
+        .receipt-pdf-table th { font-weight: 700; text-align: center; }
         .receipt-pdf-center { text-align: center; }
         .receipt-pdf-right { text-align: right; }
         .receipt-pdf-note { text-align: center; }
-
         .receipt-pdf-footer {
             display: flex;
             justify-content: space-between;
@@ -218,75 +117,22 @@
             margin-top: 18px;
             font-size: 17px;
         }
-
-        .receipt-pdf-signature {
-            width: 320px;
-            margin-left: auto;
-            text-align: center;
-        }
-
-        .receipt-pdf-signature-line {
-            border-bottom: 1px dotted #444;
-            height: 24px;
-            margin: 10px 0 8px;
-        }
-
+        .receipt-pdf-signature { width: 320px; margin-left: auto; text-align: center; }
+        .receipt-pdf-signature-line { border-bottom: 1px dotted #444; height: 24px; margin: 10px 0 8px; }
         @media print {
-            body {
-                background: #fff !important;
-                display: block !important;
-                height: auto !important;
-                overflow: visible !important;
-            }
-
-            aside,
-            main {
-                display: none !important;
-            }
-
-            .income-report-print-stage,
-            .receipt-print-stage {
-                display: none !important;
-            }
-
-            body.print-income-report .income-report-print-stage {
-                display: block !important;
-            }
-
-            body.print-receipt-copy .receipt-print-stage {
-                display: block !important;
-            }
-
-            .income-report-page {
-                width: 100% !important;
-                min-height: auto !important;
-                margin: 0 !important;
-                padding: 12mm 10mm 10mm !important;
-                page-break-after: always;
-            }
-
-            .income-report-page:last-child {
-                page-break-after: auto;
-            }
-
-            .receipt-pdf-sheet {
-                width: 100% !important;
-                min-height: auto !important;
-                margin: 0 !important;
-                padding: 18mm 14mm 12mm !important;
-            }
+            body { background: #fff !important; display: block !important; height: auto !important; overflow: visible !important; }
+            aside, main { display: none !important; }
+            .income-report-print-stage, .receipt-print-stage { display: none !important; }
+            body.print-income-report .income-report-print-stage { display: block !important; }
+            body.print-receipt-copy .receipt-print-stage { display: block !important; }
         }
     </style>
-    <script>
-        const userSession = localStorage.getItem("user_session");
-        if (!userSession) window.location.href = "index.html";
-    </script>
+    <script src="services/frontend.js"></script>
 </head>
 <body class="bg-gray-100 flex h-screen overflow-hidden">
-
     <aside class="w-64 bg-blue-800 text-white flex flex-col shadow-lg z-10 shrink-0">
         <div class="p-6 text-center border-b border-blue-700">
-            <h1 class="text-xl font-bold">กองทุนสวัสดิการฯ</h1>
+            <h1 class="text-xl font-bold">กองทุนสวัสดิการชุมชน</h1>
             <p class="text-xs text-blue-300 mt-1">เทศบาลนครนครศรีธรรมราช</p>
         </div>
         <nav class="flex-grow p-4 space-y-2">
@@ -303,18 +149,16 @@
     </aside>
 
     <main class="flex-1 p-8 overflow-y-auto w-full">
-        <div class="bg-white p-6 rounded-xl shadow-md max-w-6xl mx-auto">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">ระบบรายงาน (Reports)</h2>
-
-            <div class="flex border-b border-gray-200 mb-6">
-                <button onclick="switchTab('income')" id="tab-income" class="px-6 py-3 font-semibold text-blue-600 border-b-2 border-blue-600 hover:bg-blue-50 transition">1. รับเงินประจำวัน</button>
-                <button onclick="switchTab('overdue')" id="tab-overdue" class="px-6 py-3 font-semibold text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition">2. สมาชิกค้างชำระ</button>
-                <button onclick="switchTab('expense')" id="tab-expense" class="px-6 py-3 font-semibold text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition">3. จ่ายสวัสดิการ</button>
-                <button onclick="switchTab('transaction')" id="tab-transaction" class="px-6 py-3 font-semibold text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition">4. ธุรกรรมตามวันที่</button>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="border-b bg-slate-50 flex flex-wrap">
+                <button id="tab-income" class="px-6 py-3 font-semibold text-blue-600 border-b-2 border-blue-600 hover:bg-blue-50 transition">1. รับเงินประจำวัน</button>
+                <button id="tab-overdue" class="px-6 py-3 font-semibold text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition">2. สมาชิกค้างชำระ</button>
+                <button id="tab-expense" class="px-6 py-3 font-semibold text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition">3. จ่ายสวัสดิการ</button>
+                <button id="tab-transaction" class="px-6 py-3 font-semibold text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition">4. ธุรกรรมตามวันที่</button>
             </div>
 
-            <div id="report-income" class="report-section">
-                <div class="flex flex-wrap items-end gap-4 mb-4 bg-gray-50 p-4 rounded-lg">
+            <div id="report-income" class="report-section p-6 space-y-5">
+                <div class="flex flex-wrap gap-3 items-end">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">ตั้งแต่วันที่</label>
                         <input type="date" id="income_start_date" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -323,76 +167,126 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">ถึงวันที่</label>
                         <input type="date" id="income_end_date" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <button onclick="loadDailyIncome()" class="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">ดึงรายงาน</button>
-                    <button id="printIncomeReportBtn" type="button" onclick="printDailyIncomeReport()" class="px-6 py-2 bg-slate-700 text-white font-bold rounded-lg hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed" disabled>ออกใบเสร็จรายงาน</button>
+                    <button id="loadIncomeBtn" class="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">ดึงรายงาน</button>
+                    <button id="printIncomeReportBtn" type="button" class="px-6 py-2 bg-slate-700 text-white font-bold rounded-lg hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed" disabled>ออกรายงานพิมพ์</button>
                 </div>
-                <div class="border rounded-lg overflow-hidden">
-                    <table class="min-w-full text-left bg-white">
-                        <thead class="bg-blue-50">
-                            <tr><th class="px-4 py-3 border-b">ใบเสร็จ</th><th class="px-4 py-3 border-b">รหัสสมาชิก</th><th class="px-4 py-3 border-b">ชื่อ-สกุล</th><th class="px-4 py-3 border-b text-right">จำนวนเงิน (บาท)</th><th id="incomeActionHead" class="px-4 py-3 border-b text-center hidden">ประวัติ</th></tr>
+                <div class="overflow-x-auto border rounded-lg">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="px-4 py-3 border-b">ใบเสร็จ</th>
+                                <th class="px-4 py-3 border-b">รหัสสมาชิก</th>
+                                <th class="px-4 py-3 border-b">ชื่อ-สกุล</th>
+                                <th class="px-4 py-3 border-b text-right">จำนวนเงิน (บาท)</th>
+                                <th id="incomeActionHead" class="px-4 py-3 border-b text-center hidden">ประวัติ</th>
+                            </tr>
                         </thead>
-                        <tbody id="incomeTableBody"><tr><td colspan="4" class="text-center py-4 text-gray-500">กรุณาเลือกช่วงวันที่และกดดึงรายงาน</td></tr></tbody>
-                        <tfoot class="bg-gray-100 font-bold">
-                            <tr><td colspan="3" class="px-4 py-3 text-right">รวมเงินรับทั้งสิ้น:</td><td id="income_total" class="px-4 py-3 text-right text-blue-600 text-lg">0.00</td><td id="incomeActionFoot" class="hidden"></td></tr>
+                        <tbody id="incomeTableBody">
+                            <tr><td colspan="4" class="text-center py-4 text-gray-500">กรุณาเลือกช่วงวันที่และกดดึงรายงาน</td></tr>
+                        </tbody>
+                        <tfoot class="bg-slate-50 font-semibold">
+                            <tr>
+                                <td colspan="3" class="px-4 py-3 text-right">รวมเงินรับทั้งสิ้น:</td>
+                                <td id="income_total" class="px-4 py-3 text-right text-blue-600 text-lg">0.00</td>
+                                <td id="incomeActionFoot" class="hidden"></td>
+                            </tr>
                         </tfoot>
                     </table>
                 </div>
             </div>
 
-            <div id="report-overdue" class="report-section hidden">
-                <div class="flex justify-between items-center mb-4 bg-red-50 p-4 rounded-lg border border-red-100">
-                    <div><h3 class="font-bold text-red-700">รายชื่อสมาชิกที่ค้างชำระ 3 งวดขึ้นไป</h3><p class="text-sm text-red-600">คำนวณจากเดือนปัจจุบัน</p></div>
-                    <button onclick="loadOverdue()" class="px-6 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700">ดึงข้อมูลล่าสุด</button>
+            <div id="report-overdue" class="report-section hidden p-6 space-y-5">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-semibold text-slate-800">สมาชิกค้างชำระ</h3>
+                    <button id="loadOverdueBtn" class="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">ดึงข้อมูล</button>
                 </div>
-                <div class="border rounded-lg overflow-hidden">
-                    <table class="min-w-full text-left bg-white">
-                        <thead class="bg-red-50">
-                            <tr><th class="px-4 py-3 border-b">รหัสสมาชิก</th><th class="px-4 py-3 border-b">ชื่อ-สกุล</th><th class="px-4 py-3 border-b">จ่ายล่าสุด</th><th class="px-4 py-3 border-b text-center text-red-600">ค้างชำระ (งวด)</th></tr>
+                <div class="overflow-x-auto border rounded-lg">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="px-4 py-3 border-b">รหัสสมาชิก</th>
+                                <th class="px-4 py-3 border-b">ชื่อ-สกุล</th>
+                                <th class="px-4 py-3 border-b">งวดล่าสุด</th>
+                                <th class="px-4 py-3 border-b text-center">ค้างชำระ (เดือน)</th>
+                            </tr>
                         </thead>
-                        <tbody id="overdueTableBody"><tr><td colspan="4" class="text-center py-4 text-gray-500">กดปุ่มดึงข้อมูลเพื่อดูรายงาน</td></tr></tbody>
+                        <tbody id="overdueTableBody">
+                            <tr><td colspan="4" class="text-center py-4 text-gray-500">กดปุ่มดึงข้อมูลเพื่อดูรายงาน</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="report-expense" class="report-section hidden">
-                <div class="flex flex-wrap items-end gap-4 mb-4 bg-gray-50 p-4 rounded-lg">
+            <div id="report-expense" class="report-section hidden p-6 space-y-5">
+                <div class="flex flex-wrap gap-3 items-end">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทสวัสดิการ</label>
-                        <select id="expense_type" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"><option value="hospital">ชดเชย รพ.</option><option value="funeral">ค่าจัดการศพ</option></select>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ประเภท</label>
+                        <select id="expense_type" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="hospital">ชดเชย รพ.</option>
+                            <option value="funeral">ค่าจัดการศพ</option>
+                        </select>
                     </div>
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1">ตั้งแต่วันที่</label><input type="date" id="exp_start_date" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></div>
-                    <div><label class="block text-sm font-medium text-gray-700 mb-1">ถึงวันที่</label><input type="date" id="exp_end_date" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></div>
-                    <button onclick="loadExpenses()" class="px-6 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700">ดึงรายงาน</button>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ตั้งแต่วันที่</label>
+                        <input type="date" id="exp_start_date" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ถึงวันที่</label>
+                        <input type="date" id="exp_end_date" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <button id="loadExpenseBtn" class="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">ดึงรายงาน</button>
                 </div>
-                <div class="border rounded-lg overflow-hidden">
-                    <table class="min-w-full text-left bg-white">
-                        <thead class="bg-green-50">
-                            <tr><th class="px-4 py-3 border-b">ใบสำคัญจ่าย</th><th class="px-4 py-3 border-b">วันที่จ่าย</th><th class="px-4 py-3 border-b">สมาชิก</th><th class="px-4 py-3 border-b text-right">จำนวนเงิน (บาท)</th></tr>
+                <div class="overflow-x-auto border rounded-lg">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="px-4 py-3 border-b">เลขที่ใบสำคัญ</th>
+                                <th class="px-4 py-3 border-b">วันที่</th>
+                                <th class="px-4 py-3 border-b">สมาชิก</th>
+                                <th class="px-4 py-3 border-b text-right">จำนวนเงิน</th>
+                            </tr>
                         </thead>
-                        <tbody id="expenseTableBody"><tr><td colspan="4" class="text-center py-4 text-gray-500">ระบุเงื่อนไขและกดดึงรายงาน</td></tr></tbody>
-                        <tfoot class="bg-gray-100 font-bold">
-                            <tr><td colspan="3" class="px-4 py-3 text-right">รวมเงินจ่ายสวัสดิการ:</td><td id="expense_total" class="px-4 py-3 text-right text-green-600 text-lg">0.00</td></tr>
+                        <tbody id="expenseTableBody">
+                            <tr><td colspan="4" class="text-center py-4 text-gray-500">ระบุเงื่อนไขและกดดึงรายงาน</td></tr>
+                        </tbody>
+                        <tfoot class="bg-slate-50 font-semibold">
+                            <tr>
+                                <td colspan="3" class="px-4 py-3 text-right">รวมเงินจ่ายสวัสดิการ:</td>
+                                <td id="expense_total" class="px-4 py-3 text-right text-green-600 text-lg">0.00</td>
+                            </tr>
                         </tfoot>
                     </table>
                 </div>
             </div>
 
-            <div id="report-transaction" class="report-section hidden">
-                <div class="flex items-end gap-4 mb-4 bg-gray-50 p-4 rounded-lg">
+            <div id="report-transaction" class="report-section hidden p-6 space-y-5">
+                <div class="flex flex-wrap gap-3 items-end">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">เลือกวันที่ธุรกรรม</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">วันที่</label>
                         <input type="date" id="transaction_date" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <button onclick="loadTransactionsByDate()" class="px-6 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700">ดึงรายงาน</button>
+                    <button id="loadTransactionBtn" class="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">ดึงรายงาน</button>
                 </div>
-                <div class="border rounded-lg overflow-hidden">
-                    <table class="min-w-full text-left bg-white">
-                        <thead class="bg-purple-50">
-                            <tr><th class="px-4 py-3 border-b">เลขที่เอกสาร</th><th class="px-4 py-3 border-b">วันที่</th><th class="px-4 py-3 border-b">ประเภทธุรกรรม</th><th class="px-4 py-3 border-b">รายละเอียด</th><th class="px-4 py-3 border-b">ผู้เกี่ยวข้อง</th><th class="px-4 py-3 border-b text-right">จำนวนเงิน (บาท)</th></tr>
+                <div class="overflow-x-auto border rounded-lg">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="px-4 py-3 border-b">เลขที่เอกสาร</th>
+                                <th class="px-4 py-3 border-b">วันที่</th>
+                                <th class="px-4 py-3 border-b">ประเภทธุรกรรม</th>
+                                <th class="px-4 py-3 border-b">รายละเอียด</th>
+                                <th class="px-4 py-3 border-b">คู่รายการ</th>
+                                <th class="px-4 py-3 border-b text-right">จำนวนเงิน</th>
+                            </tr>
                         </thead>
-                        <tbody id="transactionTableBody"><tr><td colspan="6" class="text-center py-4 text-gray-500">กรุณาเลือกวันที่และกดดึงรายงาน</td></tr></tbody>
-                        <tfoot class="bg-gray-100 font-bold">
-                            <tr><td colspan="5" class="px-4 py-3 text-right">รวมจำนวนเงินทั้งสิ้น:</td><td id="transaction_total" class="px-4 py-3 text-right text-purple-600 text-lg">0.00</td></tr>
+                        <tbody id="transactionTableBody">
+                            <tr><td colspan="6" class="text-center py-4 text-gray-500">กรุณาเลือกวันที่และกดดึงรายงาน</td></tr>
+                        </tbody>
+                        <tfoot class="bg-slate-50 font-semibold">
+                            <tr>
+                                <td colspan="5" class="px-4 py-3 text-right">รวมจำนวนเงินทั้งสิ้น:</td>
+                                <td id="transaction_total" class="px-4 py-3 text-right text-purple-600 text-lg">0.00</td>
+                            </tr>
                         </tfoot>
                     </table>
                 </div>
@@ -407,14 +301,12 @@
             <div class="receipt-pdf-header">
                 <div class="receipt-pdf-number">เลขที่ <span id="pdfReceiptNo">-</span></div>
                 <p class="receipt-pdf-title">กองทุนสวัสดิการชุมชนเทศบาลนครนครศรีธรรมราช</p>
-                <p class="receipt-pdf-subtitle">ใบเสร็จรับเงิน (Copy1)</p>
+                <p class="receipt-pdf-subtitle">ใบเสร็จรับเงิน</p>
             </div>
-
             <div class="receipt-pdf-meta">
                 <div>ได้รับชำระเงินจาก <span id="pdfMemberName">-</span></div>
                 <div>วันที่ <span id="pdfReceiptDate">-</span></div>
             </div>
-
             <table class="receipt-pdf-table">
                 <colgroup>
                     <col style="width: 14%;">
@@ -426,7 +318,7 @@
                 <thead>
                     <tr>
                         <th>งวดที่</th>
-                        <th>งวดประจำวันที่</th>
+                        <th>งวดประจำเดือน</th>
                         <th>จำนวน</th>
                         <th>งวดละ</th>
                         <th>จำนวนเงิน</th>
@@ -447,7 +339,6 @@
                     </tr>
                 </tbody>
             </table>
-
             <div class="receipt-pdf-footer">
                 <div>
                     ผู้พิมพ์: <span id="pdfPrintedBy">-</span>
@@ -466,415 +357,171 @@
         <div class="receipt-history-card">
             <div class="flex items-start justify-between gap-4">
                 <div>
-                    <h3 class="text-xl font-bold text-gray-800">ประวัติใบเสร็จย้อนหลัง</h3>
+                    <h3 class="text-xl font-semibold text-slate-800">ประวัติใบเสร็จ</h3>
                     <p id="receiptHistorySubtitle" class="text-sm text-gray-500 mt-1">เลือกใบเสร็จจากรายการรับเงินประจำวัน</p>
                 </div>
                 <button type="button" id="closeReceiptHistoryBtn" class="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold">ปิด</button>
             </div>
             <div id="receiptHistoryContent" class="mt-5 text-sm text-gray-700">กำลังโหลด...</div>
-            <div class="mt-6 flex justify-end gap-3">
+            <div class="mt-6 flex justify-end">
                 <button type="button" id="printPastReceiptBtn" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed" disabled>พิมพ์ใบเสร็จย้อนหลัง</button>
             </div>
         </div>
     </div>
 
     <script>
-        const printIncomeReportBtn = document.getElementById("printIncomeReportBtn");
-        const incomeActionHead = document.getElementById("incomeActionHead");
-        const incomeActionFoot = document.getElementById("incomeActionFoot");
-        const receiptHistoryModal = document.getElementById("receiptHistoryModal");
-        const receiptHistoryContent = document.getElementById("receiptHistoryContent");
-        const receiptHistorySubtitle = document.getElementById("receiptHistorySubtitle");
-        const closeReceiptHistoryBtn = document.getElementById("closeReceiptHistoryBtn");
-        const printPastReceiptBtn = document.getElementById("printPastReceiptBtn");
-        const currentUser = JSON.parse(userSession || "{}");
-        let latestIncomeRows = [];
-        let latestIncomeRange = { start: "", end: "" };
-        let reloadAfterPrint = false;
-        let latestReceiptHistory = null;
-        const canManageReceiptHistory = currentUser.role === "admin" || currentUser.role === "superadmin";
-
-        if (userSession) {
-            document.getElementById("displayUserName").textContent = JSON.parse(userSession).full_name;
-        }
-
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-            if (confirm("ต้องการออกจากระบบใช่หรือไม่?")) {
-                localStorage.removeItem("user_session");
-                window.location.href = "index.html";
-            }
-        });
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const today = new Date().toISOString().split("T")[0];
-            document.getElementById("income_start_date").value = today;
-            document.getElementById("income_end_date").value = today;
-            document.getElementById("exp_start_date").value = today;
-            document.getElementById("exp_end_date").value = today;
-            document.getElementById("transaction_date").value = today;
-            if (canManageReceiptHistory) {
-                incomeActionHead.classList.remove("hidden");
-                incomeActionFoot.classList.remove("hidden");
-            }
-        });
-
-        closeReceiptHistoryBtn.addEventListener("click", closeReceiptHistoryModal);
-        printPastReceiptBtn.addEventListener("click", printPastReceiptFromHistory);
-        receiptHistoryModal.addEventListener("click", (event) => {
-            if (event.target === receiptHistoryModal) {
-                closeReceiptHistoryModal();
-            }
-        });
-
-        function switchTab(tabName) {
-            document.querySelectorAll(".report-section").forEach((el) => el.classList.add("hidden"));
-            ["income", "overdue", "expense", "transaction"].forEach((t) => {
-                document.getElementById("tab-" + t).className = "px-6 py-3 font-semibold text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition";
-            });
-            document.getElementById("report-" + tabName).classList.remove("hidden");
-            document.getElementById("tab-" + tabName).className = "px-6 py-3 font-semibold text-blue-600 border-b-2 border-blue-600 hover:bg-blue-50 transition";
-        }
-
-        function formatCurrency(value) {
-            return Number(value || 0).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        function escapeHtml(value) {
-            return String(value ?? "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#39;");
-        }
-
-        function formatDateThai(dateString) {
-            return new Date(dateString).toLocaleDateString("th-TH");
-        }
-
-        function formatDateThaiLong(dateString) {
-            const date = new Date(dateString);
-            const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear() + 543}`;
-        }
-
-        function setIncomePrintButtonState(enabled) {
-            printIncomeReportBtn.disabled = !enabled;
-        }
-
-        function getIncomeColumnCount() {
-            return canManageReceiptHistory ? 5 : 4;
-        }
-
-        function openReceiptHistoryModal() {
-            receiptHistoryModal.classList.add("show");
-            receiptHistoryModal.setAttribute("aria-hidden", "false");
-        }
-
-        function closeReceiptHistoryModal() {
-            receiptHistoryModal.classList.remove("show");
-            receiptHistoryModal.setAttribute("aria-hidden", "true");
-        }
-
-        function formatDateTimeThai(dateValue) {
-            return new Date(dateValue).toLocaleString("th-TH");
-        }
-
-        function readThaiNumber(numberText) {
-            const digitText = ["", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
-            const scaleText = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน"];
-
-            if (!numberText || Number(numberText) === 0) {
-                return "";
+        class ReportsPage extends WelfareApp.BasePage {
+            constructor() {
+                super();
+                this.latestIncomeRows = [];
+                this.latestIncomeRange = { start: '', end: '' };
+                this.latestReceiptHistory = null;
+                this.canManageReceiptHistory = false;
+                this.reloadAfterPrint = false;
             }
 
-            if (numberText.length > 6) {
-                const head = numberText.slice(0, -6);
-                const tail = numberText.slice(-6);
-                return `${readThaiNumber(head)}ล้าน${readThaiNumber(tail)}`;
+            init() {
+                const user = this.session.requireLogin();
+                if (!user) return;
+                this.user = user;
+                this.canManageReceiptHistory = ['admin', 'superadmin'].includes(user.role);
+
+                this.setUserDisplay();
+                this.bindLogoutButton();
+                this.bindEvents();
+                this.setupPermissions();
+                this.setDefaultDates();
+                this.switchTab('income');
             }
 
-            let result = "";
-            for (let i = 0; i < numberText.length; i += 1) {
-                const digit = Number(numberText[i]);
-                if (digit === 0) continue;
+            bindEvents() {
+                this.getElement('tab-income').addEventListener('click', () => this.switchTab('income'));
+                this.getElement('tab-overdue').addEventListener('click', () => this.switchTab('overdue'));
+                this.getElement('tab-expense').addEventListener('click', () => this.switchTab('expense'));
+                this.getElement('tab-transaction').addEventListener('click', () => this.switchTab('transaction'));
+                this.getElement('loadIncomeBtn').addEventListener('click', () => this.loadDailyIncome());
+                this.getElement('loadOverdueBtn').addEventListener('click', () => this.loadOverdue());
+                this.getElement('loadExpenseBtn').addEventListener('click', () => this.loadExpenses());
+                this.getElement('loadTransactionBtn').addEventListener('click', () => this.loadTransactionsByDate());
+                this.getElement('printIncomeReportBtn').addEventListener('click', () => this.printDailyIncomeReport());
+                this.getElement('closeReceiptHistoryBtn').addEventListener('click', () => this.closeReceiptHistoryModal());
+                this.getElement('printPastReceiptBtn').addEventListener('click', () => this.printPastReceiptFromHistory());
+                this.getElement('receiptHistoryModal').addEventListener('click', (event) => {
+                    if (event.target.id === 'receiptHistoryModal') this.closeReceiptHistoryModal();
+                });
+                window.addEventListener('afterprint', () => {
+                    document.body.classList.remove('print-income-report', 'print-receipt-copy');
+                    this.getElement('incomeReportPrintStage').innerHTML = '';
+                });
+            }
 
-                const pos = numberText.length - i - 1;
-                if (pos === 0 && digit === 1 && numberText.length > 1) {
-                    result += "เอ็ด";
-                } else if (pos === 1 && digit === 2) {
-                    result += "ยี่";
-                } else if (pos === 1 && digit === 1) {
-                    result += "";
-                } else {
-                    result += digitText[digit];
+            setupPermissions() {
+                this.getElement('incomeActionHead').classList.toggle('hidden', !this.canManageReceiptHistory);
+                this.getElement('incomeActionFoot').classList.toggle('hidden', !this.canManageReceiptHistory);
+            }
+
+            setDefaultDates() {
+                const today = new Date().toISOString().split('T')[0];
+                this.getElement('income_start_date').value = today;
+                this.getElement('income_end_date').value = today;
+                this.getElement('exp_start_date').value = today;
+                this.getElement('exp_end_date').value = today;
+                this.getElement('transaction_date').value = today;
+            }
+
+            switchTab(tabName) {
+                ['income', 'overdue', 'expense', 'transaction'].forEach((tab) => {
+                    this.getElement(`report-${tab}`).classList.toggle('hidden', tab !== tabName);
+                    const tabButton = this.getElement(`tab-${tab}`);
+                    const isActive = tab === tabName;
+                    tabButton.className = isActive
+                        ? 'px-6 py-3 font-semibold text-blue-600 border-b-2 border-blue-600 hover:bg-blue-50 transition'
+                        : 'px-6 py-3 font-semibold text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition';
+                });
+            }
+
+            setIncomePrintButtonState(enabled) {
+                this.getElement('printIncomeReportBtn').disabled = !enabled;
+            }
+
+            async loadDailyIncome() {
+                const start = this.getElement('income_start_date').value;
+                const end = this.getElement('income_end_date').value;
+                const tbody = this.getElement('incomeTableBody');
+                const colSpan = this.canManageReceiptHistory ? 5 : 4;
+
+                if (!start || !end) {
+                    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center py-4 text-red-500">กรุณาระบุวันที่ให้ครบ</td></tr>`;
+                    return;
                 }
 
-                result += scaleText[pos];
-            }
-
-            return result;
-        }
-
-        function bahtText(value) {
-            const amount = Number(value || 0).toFixed(2);
-            if (Number(amount) === 0) {
-                return "ศูนย์บาทถ้วน";
-            }
-
-            const [integerPart, decimalPart] = amount.split(".");
-            const integerText = `${readThaiNumber(integerPart)}บาท`;
-            if (decimalPart === "00") {
-                return `${integerText}ถ้วน`;
-            }
-
-            return `${integerText}${readThaiNumber(decimalPart)}สตางค์`;
-        }
-
-        function getInstallmentSummary(installments) {
-            const installmentNos = installments
-                .map((item) => Number(item.installment_no))
-                .filter((item) => !Number.isNaN(item))
-                .sort((a, b) => a - b);
-
-            const dates = installments
-                .map((item) => item.period_date)
-                .filter(Boolean)
-                .sort((a, b) => new Date(a) - new Date(b));
-
-            const totalAmount = installments.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
-            const firstAmount = installments.length ? (parseFloat(installments[0].amount) || 0) : 0;
-
-            const installmentRange = installmentNos.length
-                ? (installmentNos[0] === installmentNos[installmentNos.length - 1]
-                    ? `${installmentNos[0]}`
-                    : `${installmentNos[0]} - ${installmentNos[installmentNos.length - 1]}`)
-                : "-";
-
-            const periodRange = dates.length
-                ? (dates[0] === dates[dates.length - 1]
-                    ? formatDateThaiLong(dates[0])
-                    : `${formatDateThaiLong(dates[0])} - ${formatDateThaiLong(dates[dates.length - 1])}`)
-                : "-";
-
-            return {
-                installmentRange,
-                periodRange,
-                count: installments.length,
-                amountPerInstallment: firstAmount,
-                totalAmount
-            };
-        }
-
-        function fillPastReceiptTemplate(data) {
-            const summary = getInstallmentSummary(Array.isArray(data.installments) ? data.installments : []);
-            const memberName = data.member_name
-                || `${data.first_name || ""} ${data.last_name || ""}`.trim()
-                || data.member_code
-                || "-";
-            const printedBy = currentUser.full_name || "-";
-
-            document.getElementById("pdfReceiptNo").textContent = data.receipt_no || "-";
-            document.getElementById("pdfMemberName").textContent = memberName;
-            document.getElementById("pdfReceiptDate").textContent = data.receipt_date ? formatDateThai(data.receipt_date) : "-";
-            document.getElementById("pdfInstallmentNos").textContent = summary.installmentRange;
-            document.getElementById("pdfPeriodRange").textContent = summary.periodRange;
-            document.getElementById("pdfInstallmentCount").textContent = summary.count;
-            document.getElementById("pdfAmountPerInstallment").textContent = formatCurrency(summary.amountPerInstallment);
-            document.getElementById("pdfTotalAmount").textContent = formatCurrency(summary.totalAmount);
-            document.getElementById("pdfTotalAmountFooter").textContent = formatCurrency(summary.totalAmount);
-            document.getElementById("pdfAmountText").textContent = `(${bahtText(summary.totalAmount)})`;
-            document.getElementById("pdfPrintedBy").textContent = printedBy;
-            document.getElementById("pdfPrintedAt").textContent = formatDateTimeThai(new Date());
-            document.getElementById("pdfSignerName").textContent = printedBy;
-        }
-
-        async function viewReceiptHistory(receiptId) {
-            latestReceiptHistory = null;
-            printPastReceiptBtn.disabled = true;
-            receiptHistorySubtitle.textContent = `เลขที่ใบเสร็จ #${receiptId}`;
-            receiptHistoryContent.innerHTML = '<div class="text-center py-6 text-gray-500">กำลังโหลดข้อมูลใบเสร็จ...</div>';
-            openReceiptHistoryModal();
-
-            try {
-                const res = await fetch(`http://localhost:8000/api/incomes/receipts/${receiptId}`);
-                const result = await res.json();
-
-                if (result.status !== "success" || !result.data) {
-                    throw new Error(result.message || "ไม่พบข้อมูลใบเสร็จ");
+                if (start > end) {
+                    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center py-4 text-red-500">วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด</td></tr>`;
+                    return;
                 }
 
-                latestReceiptHistory = result.data;
-                const installments = Array.isArray(result.data.installments) ? result.data.installments : [];
-                const summary = getInstallmentSummary(installments);
-                const memberName = `${result.data.first_name || ""} ${result.data.last_name || ""}`.trim() || "-";
+                tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center py-4">กำลังโหลด...</td></tr>`;
+                this.latestIncomeRows = [];
+                this.latestIncomeRange = { start, end };
+                this.setIncomePrintButtonState(false);
 
-                receiptHistorySubtitle.textContent = `ใบเสร็จเลขที่ ${result.data.receipt_no || "-"} วันที่ ${result.data.receipt_date ? formatDateThai(result.data.receipt_date) : "-"}`;
-                receiptHistoryContent.innerHTML = `
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-                            <div class="text-xs uppercase tracking-wide text-slate-500">สมาชิก</div>
-                            <div class="mt-1 text-base font-semibold text-slate-800">${escapeHtml(memberName)}</div>
-                            <div class="mt-1 text-sm text-slate-600">เลขที่สมาชิก: ${escapeHtml(result.data.member_code || "-")}</div>
-                        </div>
-                        <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-                            <div class="text-xs uppercase tracking-wide text-slate-500">สรุปการรับเงิน</div>
-                            <div class="mt-1 text-sm text-slate-700">จำนวนงวด: <strong>${summary.count}</strong></div>
-                            <div class="mt-1 text-sm text-slate-700">งวดที่: <strong>${escapeHtml(summary.installmentRange)}</strong></div>
-                            <div class="mt-1 text-sm text-slate-700">รวมเงิน: <strong>${formatCurrency(summary.totalAmount)}</strong> บาท</div>
-                        </div>
-                    </div>
-                    <div class="mt-4 rounded-xl border border-slate-200 overflow-hidden">
-                        <table class="min-w-full text-sm">
-                            <thead class="bg-slate-100 text-slate-700">
-                                <tr>
-                                    <th class="px-4 py-2 text-left">งวดที่</th>
-                                    <th class="px-4 py-2 text-left">วันที่งวด</th>
-                                    <th class="px-4 py-2 text-right">จำนวนเงิน</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${installments.map((item) => `
-                                    <tr class="border-t border-slate-200">
-                                        <td class="px-4 py-2">${escapeHtml(item.installment_no || "-")}</td>
-                                        <td class="px-4 py-2">${item.period_date ? formatDateThai(item.period_date) : "-"}</td>
-                                        <td class="px-4 py-2 text-right">${formatCurrency(item.amount)}</td>
-                                    </tr>
-                                `).join("") || '<tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">ไม่พบรายการงวด</td></tr>'}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                printPastReceiptBtn.disabled = false;
-            } catch (error) {
-                receiptHistoryContent.innerHTML = `<div class="rounded-xl bg-red-50 border border-red-200 text-red-600 px-4 py-4">${escapeHtml(error.message || "เปิดประวัติใบเสร็จไม่สำเร็จ")}</div>`;
-            }
-        }
-
-        function printPastReceiptFromHistory() {
-            if (!latestReceiptHistory) {
-                return;
-            }
-
-            fillPastReceiptTemplate(latestReceiptHistory);
-            closeReceiptHistoryModal();
-            document.body.classList.remove("print-income-report");
-            document.body.classList.add("print-receipt-copy");
-            window.print();
-        }
-
-        async function loadDailyIncome() {
-            const start = document.getElementById("income_start_date").value;
-            const end = document.getElementById("income_end_date").value;
-            const tbody = document.getElementById("incomeTableBody");
-            const columnCount = getIncomeColumnCount();
-
-            latestIncomeRows = [];
-            latestIncomeRange = { start, end };
-            setIncomePrintButtonState(false);
-            latestReceiptHistory = null;
-
-            if (!start || !end) {
-                tbody.innerHTML = `<tr><td colspan="${columnCount}" class="text-center py-4 text-red-500">กรุณาระบุช่วงวันที่ให้ครบ</td></tr>`;
-                return;
-            }
-
-            if (start > end) {
-                tbody.innerHTML = `<tr><td colspan="${columnCount}" class="text-center py-4 text-red-500">วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = `<tr><td colspan="${columnCount}" class="text-center py-4">กำลังโหลด...</td></tr>`;
-            try {
-                const res = await fetch(`http://localhost:8000/api/reports/daily-income?start_date=${start}&end_date=${end}`);
-                const result = await res.json();
-                if (result.status === "success") {
-                    latestIncomeRows = Array.isArray(result.data) ? result.data : [];
-                    tbody.innerHTML = "";
-                    if (latestIncomeRows.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="${columnCount}" class="text-center py-4 text-red-500">ไม่มีรายการรับเงิน</td></tr>`;
-                    }
-                    latestIncomeRows.forEach((row) => {
-                        const actionCell = canManageReceiptHistory ? `<td class="px-4 py-2 text-center"><button type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs" onclick="viewReceiptHistory(${row.id})">ดูประวัติ</button></td>` : "";
-                        tbody.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="px-4 py-2">${escapeHtml(row.receipt_no)}</td><td class="px-4 py-2 text-blue-600">${escapeHtml(row.member_code || "-")}</td><td class="px-4 py-2">${escapeHtml(`${row.first_name || ""} ${row.last_name || ""}`.trim() || "-")}</td><td class="px-4 py-2 text-right">${formatCurrency(row.total_amount)}</td>${actionCell}</tr>`;
-                    });
-                    document.getElementById("income_total").textContent = formatCurrency(result.summary.total_amount || 0);
-                    setIncomePrintButtonState(latestIncomeRows.length > 0);
+                try {
+                    const result = await this.api.get(`/reports/daily-income?start_date=${start}&end_date=${end}`);
+                    this.latestIncomeRows = Array.isArray(result.data) ? result.data : [];
+                    this.renderIncomeRows(this.latestIncomeRows);
+                    this.getElement('income_total').textContent = this.formatMoney(result.summary.total_amount || 0);
+                    this.setIncomePrintButtonState(this.latestIncomeRows.length > 0);
+                } catch (error) {
+                    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center py-4 text-red-500">เชื่อมต่อ API ล้มเหลว</td></tr>`;
                 }
-            } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="${columnCount}" class="text-center py-4 text-red-500">เชื่อมต่อ API ล้มเหลว</td></tr>`;
-            }
-        }
-
-        function chunkRowsForIncomeReport(rows) {
-            const fullPageSize = 24;
-            const lastPageSize = 18;
-            const totalRows = rows.length;
-
-            if (totalRows <= fullPageSize) {
-                return [rows];
             }
 
-            const pages = [];
-            let remainingRows = totalRows;
-            let cursor = 0;
+            renderIncomeRows(rows) {
+                const tbody = this.getElement('incomeTableBody');
+                const colSpan = this.canManageReceiptHistory ? 5 : 4;
 
-            while (remainingRows > fullPageSize) {
-                if (remainingRows <= fullPageSize + lastPageSize) {
-                    break;
+                if (!rows.length) {
+                    tbody.innerHTML = `<tr><td colspan="${colSpan}" class="text-center py-4 text-red-500">ไม่มีรายการรับเงิน</td></tr>`;
+                    return;
                 }
-                pages.push(rows.slice(cursor, cursor + fullPageSize));
-                cursor += fullPageSize;
-                remainingRows -= fullPageSize;
+
+                tbody.innerHTML = rows.map((row) => {
+                    const actionButton = this.canManageReceiptHistory
+                        ? `<td class="px-4 py-2 text-center"><button type="button" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs" data-receipt-id="${row.id}">ดูประวัติ</button></td>`
+                        : '';
+                    return `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2">${row.receipt_no}</td>
+                            <td class="px-4 py-2 text-blue-600">${row.member_code || '-'}</td>
+                            <td class="px-4 py-2">${`${row.first_name || ''} ${row.last_name || ''}`.trim() || '-'}</td>
+                            <td class="px-4 py-2 text-right">${this.formatMoney(row.total_amount)}</td>
+                            ${actionButton}
+                        </tr>
+                    `;
+                }).join('');
+
+                tbody.querySelectorAll('[data-receipt-id]').forEach((button) => {
+                    button.addEventListener('click', () => this.viewReceiptHistory(button.dataset.receiptId));
+                });
             }
 
-            pages.push(rows.slice(cursor));
-            return pages;
-        }
+            chunkRowsForIncomeReport(rows) {
+                const pageSize = 24;
+                const pages = [];
+                for (let index = 0; index < rows.length; index += pageSize) {
+                    pages.push(rows.slice(index, index + pageSize));
+                }
+                return pages;
+            }
 
-        function renderIncomePrintLayout() {
-            const printStage = document.getElementById("incomeReportPrintStage");
-            const rows = latestIncomeRows;
-            const pages = chunkRowsForIncomeReport(rows);
-            const totalAmount = rows.reduce((sum, row) => sum + Number(row.total_amount || 0), 0);
-            const dateText = `ประจำวันที่ ${formatDateThaiLong(latestIncomeRange.start)} ถึงวันที่ ${formatDateThaiLong(latestIncomeRange.end)}`;
+            renderIncomePrintLayout() {
+                const rows = this.latestIncomeRows;
+                const pages = this.chunkRowsForIncomeReport(rows);
+                const totalAmount = rows.reduce((sum, row) => sum + Number(row.total_amount || 0), 0);
+                const printStage = this.getElement('incomeReportPrintStage');
+                const dateText = `ประจำวันที่ ${this.formatDateThaiLong(this.latestIncomeRange.start)} ถึงวันที่ ${this.formatDateThaiLong(this.latestIncomeRange.end)}`;
 
-            printStage.innerHTML = pages.map((pageRows, pageIndex) => {
-                const rowHtml = pageRows.map((row, rowIndex) => `
-                    <tr>
-                        <td class="income-report-center">${pageIndex * 24 + rowIndex + 1}</td>
-                        <td class="income-report-center">${escapeHtml(row.receipt_no)}</td>
-                        <td class="income-report-center">${formatDateThai(row.receipt_date)}</td>
-                        <td class="income-report-center">${escapeHtml(row.member_code || "-")}</td>
-                        <td class="income-report-left">${escapeHtml(row.first_name || "-")}</td>
-                        <td class="income-report-left">${escapeHtml(row.last_name || "-")}</td>
-                        <td class="income-report-right">${formatCurrency(row.total_amount)}</td>
-                    </tr>
-                `).join("");
-
-                const isLastPage = pageIndex === pages.length - 1;
-                const fillerTarget = isLastPage ? 18 : 24;
-                const fillerCount = Math.max(0, fillerTarget - pageRows.length);
-                const fillerHtml = Array.from({ length: fillerCount }, () => `
-                    <tr>
-                        <td class="income-report-center">&nbsp;</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                `).join("");
-
-                const summaryHtml = isLastPage ? `
-                    <div class="income-report-summary">
-                        <div>รวมรายการ ${rows.length.toLocaleString("th-TH")} รายการ</div>
-                        <div>รวมเงิน ${formatCurrency(totalAmount)}</div>
-                    </div>
-                ` : "";
-
-                return `
+                printStage.innerHTML = pages.map((pageRows, pageIndex) => `
                     <section class="income-report-page">
                         <div class="income-report-org">กองทุนสวัสดิการชุมชนเทศบาลนครนครศรีธรรมราช</div>
                         <div class="income-report-title-box">
@@ -889,95 +536,256 @@
                                     <th style="width: 18%;">เลขที่ใบเสร็จ</th>
                                     <th style="width: 13%;">วันที่</th>
                                     <th style="width: 13%;">เลขที่สมาชิก</th>
-                                    <th style="width: 16%;">ชื่อสมาชิก</th>
+                                    <th style="width: 16%;">ชื่อ</th>
                                     <th style="width: 18%;">นามสกุล</th>
-                                    <th style="width: 15%;" class="income-report-right">รวมเงิน</th>
+                                    <th style="width: 15%;">รวมเงิน</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${rowHtml}
-                                ${fillerHtml}
+                                ${pageRows.map((row, rowIndex) => `
+                                    <tr>
+                                        <td class="income-report-center">${pageIndex * 24 + rowIndex + 1}</td>
+                                        <td class="income-report-center">${row.receipt_no}</td>
+                                        <td class="income-report-center">${this.formatDateThai(row.receipt_date)}</td>
+                                        <td class="income-report-center">${row.member_code || '-'}</td>
+                                        <td class="income-report-left">${row.first_name || '-'}</td>
+                                        <td class="income-report-left">${row.last_name || '-'}</td>
+                                        <td class="income-report-right">${this.formatMoney(row.total_amount)}</td>
+                                    </tr>
+                                `).join('')}
                             </tbody>
                         </table>
-                        ${summaryHtml}
+                        ${pageIndex === pages.length - 1 ? `
+                            <div class="income-report-summary">
+                                <div>รวมรายการ ${rows.length.toLocaleString('th-TH')} รายการ</div>
+                                <div>รวมเงิน ${this.formatMoney(totalAmount)}</div>
+                            </div>
+                        ` : ''}
                     </section>
-                `;
-            }).join("");
-        }
-
-        function printDailyIncomeReport() {
-            if (!latestIncomeRows.length) {
-                alert("กรุณาดึงรายงานรับเงินประจำวันก่อน");
-                return;
+                `).join('');
             }
 
-            renderIncomePrintLayout();
-            reloadAfterPrint = true;
-            document.body.classList.remove("print-receipt-copy");
-            document.body.classList.add("print-income-report");
-            window.print();
-        }
+            printDailyIncomeReport() {
+                if (!this.latestIncomeRows.length) {
+                    window.alert('กรุณาดึงรายงานรับเงินก่อน');
+                    return;
+                }
 
-        window.addEventListener("afterprint", () => {
-            document.body.classList.remove("print-income-report", "print-receipt-copy");
-            document.getElementById("incomeReportPrintStage").innerHTML = "";
-            if (reloadAfterPrint) {
-                reloadAfterPrint = false;
+                this.renderIncomePrintLayout();
+                document.body.classList.remove('print-receipt-copy');
+                document.body.classList.add('print-income-report');
+                window.print();
             }
-        });
 
-        async function loadOverdue() {
-            const tbody = document.getElementById("overdueTableBody");
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">กำลังโหลด...</td></tr>';
-            try {
-                const res = await fetch("http://localhost:8000/api/reports/overdue");
-                const result = await res.json();
-                if(result.status === "success") {
-                    tbody.innerHTML = "";
-                    if(result.data.length === 0) tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-green-500">ไม่มีสมาชิกค้างชำระเกิน 3 งวด 🎉</td></tr>';
-                    result.data.forEach(r => {
-                        const lastPaid = r.last_paid_month ? new Date(r.last_paid_month).toLocaleDateString("th-TH") : "ไม่เคยชำระ";
-                        tbody.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="px-4 py-2 text-blue-600">${r.member_code}</td><td class="px-4 py-2">${r.first_name} ${r.last_name}</td><td class="px-4 py-2">${lastPaid}</td><td class="px-4 py-2 text-center font-bold text-red-600 bg-red-50">${r.overdue_months || "ทั้งหมด"}</td></tr>`;
-                    });
-                }
-            } catch (err) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">เชื่อมต่อ API ล้มเหลว</td></tr>'; }
-        }
+            async loadOverdue() {
+                const tbody = this.getElement('overdueTableBody');
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">กำลังโหลด...</td></tr>';
 
-        async function loadExpenses() {
-            const type = document.getElementById("expense_type").value;
-            const start = document.getElementById("exp_start_date").value;
-            const end = document.getElementById("exp_end_date").value;
-            const tbody = document.getElementById("expenseTableBody");
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">กำลังโหลด...</td></tr>';
-            try {
-                const res = await fetch(`http://localhost:8000/api/reports/expenses?type=${type}&start_date=${start}&end_date=${end}`);
-                const result = await res.json();
-                if(result.status === "success") {
-                    tbody.innerHTML = "";
-                    if(result.data.length === 0) tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">ไม่มีรายการจ่ายเงิน</td></tr>';
-                    result.data.forEach(r => tbody.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="px-4 py-2 font-medium">${r.voucher_no}</td><td class="px-4 py-2">${new Date(r.voucher_date).toLocaleDateString("th-TH")}</td><td class="px-4 py-2">${r.member_code} (${r.first_name} ${r.last_name})</td><td class="px-4 py-2 text-right">${parseFloat(r.total_amount).toLocaleString("th-TH", {minimumFractionDigits: 2})}</td></tr>`);
-                    document.getElementById("expense_total").textContent = result.summary.total_expense_amount.toLocaleString("th-TH", {minimumFractionDigits: 2});
-                }
-            } catch (err) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">เชื่อมต่อ API ล้มเหลว</td></tr>'; }
-        }
+                try {
+                    const result = await this.api.get('/reports/overdue');
+                    if (!result.data.length) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-green-500">ไม่มีสมาชิกค้างชำระเกิน 3 งวด</td></tr>';
+                        return;
+                    }
 
-        async function loadTransactionsByDate() {
-            const date = document.getElementById("transaction_date").value;
-            const tbody = document.getElementById("transactionTableBody");
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4">กำลังโหลด...</td></tr>';
-            try {
-                const res = await fetch(`http://localhost:8000/api/reports/transactions?date=${date}`);
-                const result = await res.json();
-                if (result.status === "success") {
-                    tbody.innerHTML = "";
-                    if (result.data.length === 0) tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">ไม่มีรายการธุรกรรมในวันที่เลือก</td></tr>';
-                    result.data.forEach(r => tbody.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="px-4 py-2 font-medium">${r.document_no}</td><td class="px-4 py-2">${new Date(r.transaction_date).toLocaleDateString("th-TH")}</td><td class="px-4 py-2">${r.transaction_type}</td><td class="px-4 py-2">${r.description || "-"}</td><td class="px-4 py-2">${r.party_name || "-"}</td><td class="px-4 py-2 text-right">${parseFloat(r.amount).toLocaleString("th-TH", {minimumFractionDigits: 2})}</td></tr>`);
-                    document.getElementById("transaction_total").textContent = result.summary.total_amount.toLocaleString("th-TH", { minimumFractionDigits: 2 });
+                    tbody.innerHTML = result.data.map((item) => `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2 text-blue-600">${item.member_code}</td>
+                            <td class="px-4 py-2">${item.first_name} ${item.last_name}</td>
+                            <td class="px-4 py-2">${item.last_paid_month ? this.formatDateThai(item.last_paid_month) : 'ไม่เคยชำระ'}</td>
+                            <td class="px-4 py-2 text-center font-bold text-red-600 bg-red-50">${item.overdue_months || 'ทั้งหมด'}</td>
+                        </tr>
+                    `).join('');
+                } catch (error) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">เชื่อมต่อ API ล้มเหลว</td></tr>';
                 }
-            } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">เชื่อมต่อ API ล้มเหลว</td></tr>';
+            }
+
+            async loadExpenses() {
+                const type = this.getElement('expense_type').value;
+                const start = this.getElement('exp_start_date').value;
+                const end = this.getElement('exp_end_date').value;
+                const tbody = this.getElement('expenseTableBody');
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">กำลังโหลด...</td></tr>';
+
+                try {
+                    const result = await this.api.get(`/reports/expenses?type=${type}&start_date=${start}&end_date=${end}`);
+                    if (!result.data.length) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">ไม่มีรายการจ่ายเงิน</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = result.data.map((item) => `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2 font-medium">${item.voucher_no}</td>
+                            <td class="px-4 py-2">${this.formatDateThai(item.voucher_date)}</td>
+                            <td class="px-4 py-2">${item.member_code} (${item.first_name} ${item.last_name})</td>
+                            <td class="px-4 py-2 text-right">${this.formatMoney(item.total_amount)}</td>
+                        </tr>
+                    `).join('');
+                    this.getElement('expense_total').textContent = this.formatMoney(result.summary.total_expense_amount || 0);
+                } catch (error) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">เชื่อมต่อ API ล้มเหลว</td></tr>';
+                }
+            }
+
+            async loadTransactionsByDate() {
+                const date = this.getElement('transaction_date').value;
+                const tbody = this.getElement('transactionTableBody');
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4">กำลังโหลด...</td></tr>';
+
+                try {
+                    const result = await this.api.get(`/reports/transactions?date=${date}`);
+                    if (!result.data.length) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">ไม่มีรายการธุรกรรมในวันที่เลือก</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = result.data.map((item) => `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2 font-medium">${item.document_no}</td>
+                            <td class="px-4 py-2">${this.formatDateThai(item.transaction_date)}</td>
+                            <td class="px-4 py-2">${item.transaction_type}</td>
+                            <td class="px-4 py-2">${item.description || '-'}</td>
+                            <td class="px-4 py-2">${item.party_name || '-'}</td>
+                            <td class="px-4 py-2 text-right">${this.formatMoney(item.amount)}</td>
+                        </tr>
+                    `).join('');
+                    this.getElement('transaction_total').textContent = this.formatMoney(result.summary.total_amount || 0);
+                } catch (error) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">เชื่อมต่อ API ล้มเหลว</td></tr>';
+                }
+            }
+
+            openReceiptHistoryModal() {
+                this.getElement('receiptHistoryModal').classList.add('show');
+            }
+
+            closeReceiptHistoryModal() {
+                this.getElement('receiptHistoryModal').classList.remove('show');
+            }
+
+            getInstallmentSummary(installments) {
+                const installmentNos = installments.map((item) => Number(item.installment_no)).filter((item) => !Number.isNaN(item)).sort((a, b) => a - b);
+                const dates = installments.map((item) => item.period_date).filter(Boolean).sort((a, b) => new Date(a) - new Date(b));
+                const totalAmount = installments.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+                const firstAmount = installments.length ? (parseFloat(installments[0].amount) || 0) : 0;
+
+                return {
+                    installmentRange: installmentNos.length ? (installmentNos[0] === installmentNos[installmentNos.length - 1] ? `${installmentNos[0]}` : `${installmentNos[0]} - ${installmentNos[installmentNos.length - 1]}`) : '-',
+                    periodRange: dates.length ? (dates[0] === dates[dates.length - 1] ? this.formatDateThaiLong(dates[0]) : `${this.formatDateThaiLong(dates[0])} - ${this.formatDateThaiLong(dates[dates.length - 1])}`) : '-',
+                    count: installments.length,
+                    amountPerInstallment: firstAmount,
+                    totalAmount
+                };
+            }
+
+            async viewReceiptHistory(receiptId) {
+                this.latestReceiptHistory = null;
+                this.getElement('printPastReceiptBtn').disabled = true;
+                this.getElement('receiptHistorySubtitle').textContent = `ใบเสร็จ #${receiptId}`;
+                this.getElement('receiptHistoryContent').innerHTML = '<div class="text-center py-6 text-gray-500">กำลังโหลดข้อมูลใบเสร็จ...</div>';
+                this.openReceiptHistoryModal();
+
+                try {
+                    const result = await this.api.get(`/incomes/receipts/${receiptId}`);
+                    const data = result.data;
+                    this.latestReceiptHistory = data;
+                    const installments = Array.isArray(data.installments) ? data.installments : [];
+                    const summary = this.getInstallmentSummary(installments);
+                    const memberName = `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.member_code || '-';
+
+                    this.getElement('receiptHistorySubtitle').textContent = `ใบเสร็จเลขที่ ${data.receipt_no || '-'} วันที่ ${data.receipt_date ? this.formatDateThai(data.receipt_date) : '-'}`;
+                    this.getElement('receiptHistoryContent').innerHTML = `
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+                                <div class="text-xs uppercase tracking-wide text-slate-500">สมาชิก</div>
+                                <div class="mt-1 text-base font-semibold text-slate-800">${memberName}</div>
+                                <div class="mt-1 text-sm text-slate-600">เลขที่สมาชิก: ${data.member_code || '-'}</div>
+                            </div>
+                            <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+                                <div class="text-xs uppercase tracking-wide text-slate-500">สรุปการรับเงิน</div>
+                                <div class="mt-1 text-sm text-slate-700">จำนวนงวด: <strong>${summary.count}</strong></div>
+                                <div class="mt-1 text-sm text-slate-700">งวดที่: <strong>${summary.installmentRange}</strong></div>
+                                <div class="mt-1 text-sm text-slate-700">รวมเงิน: <strong>${this.formatMoney(summary.totalAmount)}</strong> บาท</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 rounded-xl border border-slate-200 overflow-hidden">
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-slate-100 text-slate-700">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left">งวดที่</th>
+                                        <th class="px-4 py-2 text-left">วันที่งวด</th>
+                                        <th class="px-4 py-2 text-right">จำนวนเงิน</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${installments.map((item) => `
+                                        <tr class="border-t border-slate-200">
+                                            <td class="px-4 py-2">${item.installment_no || '-'}</td>
+                                            <td class="px-4 py-2">${item.period_date ? this.formatDateThai(item.period_date) : '-'}</td>
+                                            <td class="px-4 py-2 text-right">${this.formatMoney(item.amount)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    this.getElement('printPastReceiptBtn').disabled = false;
+                } catch (error) {
+                    this.getElement('receiptHistoryContent').innerHTML = `<div class="rounded-xl bg-red-50 border border-red-200 text-red-600 px-4 py-4">${error.message || 'เปิดประวัติใบเสร็จไม่สำเร็จ'}</div>`;
+                }
+            }
+
+            fillPastReceiptTemplate(data) {
+                const summary = this.getInstallmentSummary(Array.isArray(data.installments) ? data.installments : []);
+                const memberName = data.member_name || `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.member_code || '-';
+                this.getElement('pdfReceiptNo').textContent = data.receipt_no || '-';
+                this.getElement('pdfMemberName').textContent = memberName;
+                this.getElement('pdfReceiptDate').textContent = data.receipt_date ? this.formatDateThai(data.receipt_date) : '-';
+                this.getElement('pdfInstallmentNos').textContent = summary.installmentRange;
+                this.getElement('pdfPeriodRange').textContent = summary.periodRange;
+                this.getElement('pdfInstallmentCount').textContent = summary.count;
+                this.getElement('pdfAmountPerInstallment').textContent = this.formatMoney(summary.amountPerInstallment);
+                this.getElement('pdfTotalAmount').textContent = this.formatMoney(summary.totalAmount);
+                this.getElement('pdfTotalAmountFooter').textContent = this.formatMoney(summary.totalAmount);
+                this.getElement('pdfAmountText').textContent = `(รวม ${this.bahtText(summary.totalAmount)})`;
+                this.getElement('pdfPrintedBy').textContent = this.user.full_name || '-';
+                this.getElement('pdfPrintedAt').textContent = this.formatDateTimeThai(new Date());
+                this.getElement('pdfSignerName').textContent = this.user.full_name || '-';
+            }
+
+            printPastReceiptFromHistory() {
+                if (!this.latestReceiptHistory) return;
+                this.fillPastReceiptTemplate(this.latestReceiptHistory);
+                this.closeReceiptHistoryModal();
+                document.body.classList.remove('print-income-report');
+                document.body.classList.add('print-receipt-copy');
+                window.print();
+            }
+
+            formatMoney(value) {
+                return Number(value || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            formatDateThai(value) {
+                return value ? new Date(value).toLocaleDateString('th-TH') : '-';
+            }
+
+            formatDateThaiLong(value) {
+                return value ? new Date(value).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) : '-';
+            }
+
+            formatDateTimeThai(value) {
+                return new Date(value).toLocaleString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+
+            bahtText(value) {
+                return `${this.formatMoney(value)} บาท`;
             }
         }
+
+        new ReportsPage().init();
     </script>
 </body>
 </html>

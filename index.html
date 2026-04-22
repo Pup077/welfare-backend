@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เข้าสู่ระบบ | กองทุนสวัสดิการชุมชนฯ</title>
+    <title>เข้าสู่ระบบ | กองทุนสวัสดิการชุมชน</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <style> body { font-family: 'Prompt', sans-serif; } </style>
+    <script src="services/frontend.js"></script>
 </head>
 <body class="bg-gray-100 h-screen flex items-center justify-center">
 
@@ -23,7 +24,7 @@
             </div>
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">รหัสผ่าน</label>
-                <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="password" id="password" required placeholder="กรอกรหัสผ่าน" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
             <div>
                 <label class="block text-gray-700 font-semibold mb-2">จุดรับเงิน (Terminal)</label>
@@ -40,65 +41,56 @@
     </div>
 
     <script>
-        // 🛡️ เช็คว่าถ้าเคยล็อกอินค้างไว้ ให้พาเข้าหน้า Dashboard เลย ไม่ต้องล็อกอินซ้ำ
-        if (localStorage.getItem('user_session')) {
-            window.location.href = 'dashboard.html';
-        }
+        class LoginPage extends WelfareApp.BasePage {
+            constructor() {
+                super();
+                this.form = this.getElement('loginForm');
+                this.loginButton = this.getElement('loginBtn');
+                this.alertBox = new WelfareApp.AlertBoxController(this.getElement('alertBox'));
+            }
 
-        const loginForm = document.getElementById('loginForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const alertBox = document.getElementById('alertBox');
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-            
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            const termId = document.getElementById('terminal_id').value;
-
-            loginBtn.textContent = "กำลังตรวจสอบ...";
-            loginBtn.disabled = true;
-            alertBox.classList.add('hidden');
-
-            try {
-                // ยิง API ไปที่ Backend
-                const response = await fetch('http://localhost:8000/api/auth/login-secure', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: user, password: pass, terminal_id: termId })
-                });
-                
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    // เปลี่ยนปุ่มเป็นสีเขียว
-                    loginBtn.textContent = "สำเร็จ! กำลังพาเข้าระบบ...";
-                    loginBtn.classList.replace('bg-blue-600', 'bg-green-500');
-                    alertBox.classList.remove('hidden', 'bg-red-100', 'text-red-700');
-                    alertBox.classList.add('bg-green-100', 'text-green-800');
-                    alertBox.textContent = `ยินดีต้อนรับคุณ: ${result.user.full_name}`;
-                    
-                    // 🌟 2 บรรทัดนี้แหละครับที่เป็นหัวใจสำคัญ! (จำรหัส และ เปลี่ยนหน้าเว็บ)
-                    localStorage.setItem('user_session', JSON.stringify(result.user));
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html'; // สั่งให้เบราว์เซอร์เด้งไปหน้า Dashboard
-                    }, 1000);
-                    
-                } else {
-                    throw new Error(result.message || 'เข้าสู่ระบบไม่สำเร็จ');
+            init() {
+                // ถ้ามี session ค้างอยู่แล้ว ให้ไปหน้าหลักทันที
+                if (this.session.getUser()) {
+                    window.location.href = 'dashboard.html';
+                    return;
                 }
-            } catch (error) {
-                alertBox.textContent = error.message === 'Failed to fetch' ? 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้' : error.message;
-                alertBox.classList.remove('hidden');
-                alertBox.classList.add('bg-red-100', 'text-red-700');
-            } finally {
-                // คืนค่าปุ่ม ถ้าไม่ได้ขึ้นว่าสำเร็จ 
-                if(!loginBtn.textContent.includes("สำเร็จ")) {
-                    loginBtn.textContent = "เข้าสู่ระบบ";
-                    loginBtn.disabled = false;
+
+                this.form.addEventListener('submit', (event) => this.handleSubmit(event));
+            }
+
+            async handleSubmit(event) {
+                event.preventDefault();
+                const restoreButton = this.withButtonLoading(this.loginButton, 'กำลังตรวจสอบ...');
+                this.alertBox.hide();
+
+                try {
+                    const result = await this.api.post('/auth/login-secure', {
+                        username: this.getElement('username').value,
+                        password: this.getElement('password').value,
+                        terminal_id: this.getElement('terminal_id').value
+                    });
+
+                    this.session.saveUser(result.user);
+                    this.loginButton.textContent = 'สำเร็จ กำลังเข้าสู่ระบบ...';
+                    this.loginButton.classList.replace('bg-blue-600', 'bg-green-500');
+                    this.alertBox.showSuccess(`ยินดีต้อนรับคุณ ${result.user.full_name}`);
+
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } catch (error) {
+                    restoreButton();
+                    this.alertBox.showError(
+                        error.message === 'Failed to fetch'
+                            ? 'เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ'
+                            : error.message
+                    );
                 }
             }
-        });
+        }
+
+        new LoginPage().init();
     </script>
 </body>
 </html>
