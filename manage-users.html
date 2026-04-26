@@ -31,7 +31,15 @@
     </aside>
 
     <main class="flex-1 p-8 overflow-y-auto w-full">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">ตั้งค่าผู้ใช้งานระบบ</h2>
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">จัดการผู้ใช้งานและตรวจสอบการเข้าใช้งาน</h2>
+                <p class="text-sm text-gray-500 mt-1">สร้างบัญชีผู้ใช้งาน ตรวจสอบเวลาเข้า-ออก และประวัติการทำธุรกรรมของเจ้าหน้าที่</p>
+            </div>
+            <button id="reloadAuditBtn" class="self-start lg:self-auto text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition shadow">
+                รีเฟรชประวัติ
+            </button>
+        </div>
 
         <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-yellow-400 mb-8 max-w-5xl">
             <h3 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">สร้างบัญชีผู้ใช้งานใหม่</h3>
@@ -72,7 +80,7 @@
             <div id="alertBox" class="hidden mt-4 px-4 py-3 rounded-lg text-sm text-center font-medium"></div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md overflow-hidden max-w-5xl">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden max-w-5xl mb-8">
             <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
                 <h3 class="font-bold text-gray-700">รายชื่อผู้ใช้งานทั้งหมด</h3>
                 <button id="reloadUsersBtn" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded transition">รีเฟรชข้อมูล</button>
@@ -92,7 +100,134 @@
                 </tbody>
             </table>
         </div>
+
+        <section class="max-w-7xl space-y-8">
+            <div class="bg-white p-5 rounded-xl shadow-md border-t-4 border-indigo-500">
+                <div class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">ระบบตรวจสอบการเข้าใช้งาน</h3>
+                        <p class="text-sm text-gray-500 mt-1">กรองประวัติตามช่วงวันที่และเจ้าหน้าที่ เพื่อดูเวลาเข้าสู่ระบบ เวลาออกจากเว็บไซต์ และการทำรายการ</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full xl:w-auto">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">ตั้งแต่วันที่</label>
+                            <input type="date" id="auditStartDate" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">ถึงวันที่</label>
+                            <input type="date" id="auditEndDate" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">เจ้าหน้าที่</label>
+                            <select id="auditEmployeeFilter" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                                <option value="">ทั้งหมด</option>
+                            </select>
+                        </div>
+                        <button id="applyAuditFilterBtn" class="self-end bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition">
+                            ค้นหา
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div>
+                        <h3 class="font-bold text-gray-700">เวลาเข้า-ออกเว็บไซต์</h3>
+                        <p class="text-xs text-gray-500">แสดงชื่อ ตำแหน่ง จุดใช้งาน เวลา login และ logout</p>
+                    </div>
+                    <span id="accessLogCount" class="text-sm text-gray-500">0 รายการ</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left border-collapse">
+                        <thead class="bg-indigo-50 text-indigo-800 border-b border-indigo-100">
+                            <tr>
+                                <th class="px-5 py-3 font-semibold">ชื่อผู้ใช้งาน</th>
+                                <th class="px-5 py-3 font-semibold">ตำแหน่ง</th>
+                                <th class="px-5 py-3 font-semibold">จุดใช้งาน</th>
+                                <th class="px-5 py-3 font-semibold">เวลา Login</th>
+                                <th class="px-5 py-3 font-semibold">เวลาออกจากเว็บไซต์</th>
+                                <th class="px-5 py-3 font-semibold text-center">ระยะเวลา</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accessLogTableBody" class="text-gray-700">
+                            <tr><td colspan="6" class="text-center py-8 text-gray-400">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div>
+                        <h3 class="font-bold text-gray-700">ประวัติการทำธุรกรรม</h3>
+                        <p class="text-xs text-gray-500">รวมรายการรับเงินสมทบและจ่ายสวัสดิการ พร้อมชื่อ ตำแหน่ง และเวลาที่บันทึก</p>
+                    </div>
+                    <span id="transactionLogCount" class="text-sm text-gray-500">0 รายการ</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left border-collapse">
+                        <thead class="bg-emerald-50 text-emerald-800 border-b border-emerald-100">
+                            <tr>
+                                <th class="px-5 py-3 font-semibold">เวลา</th>
+                                <th class="px-5 py-3 font-semibold">ชื่อผู้ทำรายการ</th>
+                                <th class="px-5 py-3 font-semibold">ตำแหน่ง</th>
+                                <th class="px-5 py-3 font-semibold">รายการ</th>
+                                <th class="px-5 py-3 font-semibold">เลขที่เอกสาร</th>
+                                <th class="px-5 py-3 font-semibold">สมาชิก/ผู้เกี่ยวข้อง</th>
+                                <th class="px-5 py-3 font-semibold text-right">จำนวนเงิน</th>
+                                <th class="px-5 py-3 font-semibold text-center">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionLogTableBody" class="text-gray-700">
+                            <tr><td colspan="8" class="text-center py-8 text-gray-400">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
     </main>
+
+    <div id="editUserModal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-40 items-center justify-center p-4">
+        <div class="bg-white w-full max-w-xl rounded-xl shadow-2xl border-t-4 border-blue-600 overflow-hidden">
+            <div class="p-5 bg-gray-50 border-b flex items-start justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">แก้ไขผู้ใช้งาน</h3>
+                    <p class="text-sm text-gray-500 mt-1">แก้ชื่อ สิทธิ์การใช้งาน หรือกำหนดรหัสผ่านใหม่</p>
+                </div>
+                <button type="button" id="closeEditModalBtn" class="text-gray-400 hover:text-gray-700 text-2xl leading-none" aria-label="ปิด">&times;</button>
+            </div>
+            <form id="editUserForm" class="p-6 space-y-4">
+                <input type="hidden" id="edit_user_id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">รหัสพนักงาน</label>
+                    <input type="text" id="edit_emp_code" disabled class="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ - นามสกุล *</label>
+                    <input type="text" id="edit_full_name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">สิทธิ์การใช้งาน (Role) *</label>
+                    <select id="edit_role" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 font-semibold text-blue-700">
+                        <option value="officer">เจ้าหน้าที่ทั่วไป</option>
+                        <option value="admin">Admin</option>
+                        <option value="superadmin">Super Admin</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่านใหม่</label>
+                    <input type="password" id="edit_password" minlength="6" placeholder="เว้นว่างไว้หากไม่ต้องการเปลี่ยน" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-gray-400 mt-1">กรอกอย่างน้อย 6 ตัวอักษรเมื่อเปลี่ยนรหัสผ่าน</p>
+                </div>
+                <div id="editAlertBox" class="hidden px-4 py-3 rounded-lg text-sm text-center font-medium"></div>
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
+                    <button type="button" id="cancelEditUserBtn" class="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition">ยกเลิก</button>
+                    <button type="submit" id="saveEditUserBtn" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow transition">บันทึกการแก้ไข</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         class UserManagementPage extends WelfareApp.BasePage {
@@ -101,7 +236,14 @@
                 this.form = this.getElement('createUserForm');
                 this.submitButton = this.getElement('submitBtn');
                 this.userTableBody = this.getElement('userTableBody');
+                this.accessLogTableBody = this.getElement('accessLogTableBody');
+                this.transactionLogTableBody = this.getElement('transactionLogTableBody');
                 this.alertBox = new WelfareApp.AlertBoxController(this.getElement('alertBox'));
+                this.editForm = this.getElement('editUserForm');
+                this.editModal = this.getElement('editUserModal');
+                this.editAlertBox = new WelfareApp.AlertBoxController(this.getElement('editAlertBox'));
+                this.editSubmitButton = this.getElement('saveEditUserBtn');
+                this.users = [];
             }
 
             init() {
@@ -116,8 +258,18 @@
 
                 this.bindLogoutButton();
                 this.form.addEventListener('submit', (event) => this.handleCreateUser(event));
+                this.editForm.addEventListener('submit', (event) => this.handleUpdateUser(event));
+                this.getElement('closeEditModalBtn').addEventListener('click', () => this.closeEditModal());
+                this.getElement('cancelEditUserBtn').addEventListener('click', () => this.closeEditModal());
+                this.editModal.addEventListener('click', (event) => {
+                    if (event.target === this.editModal) this.closeEditModal();
+                });
                 this.getElement('reloadUsersBtn').addEventListener('click', () => this.loadUsers());
+                this.getElement('reloadAuditBtn').addEventListener('click', () => this.loadAuditLogs());
+                this.getElement('applyAuditFilterBtn').addEventListener('click', () => this.loadAuditLogs());
+                this.setDefaultAuditDates();
                 this.loadUsers();
+                this.loadAuditLogs();
             }
 
             async loadUsers() {
@@ -125,7 +277,13 @@
 
                 try {
                     const result = await this.api.get('/users');
-                    this.userTableBody.innerHTML = result.data.map((user) => this.createUserRow(user)).join('');
+                    const users = result.data || [];
+                    this.users = users;
+                    this.userTableBody.innerHTML = users.length
+                        ? users.map((user) => this.createUserRow(user)).join('')
+                        : '<tr><td colspan="5" class="text-center py-8 text-gray-400">ยังไม่มีข้อมูลผู้ใช้งาน</td></tr>';
+                    this.bindUserRowActions();
+                    this.populateEmployeeFilter(users);
                 } catch (error) {
                     this.userTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-red-500">เชื่อมต่อเซิร์ฟเวอร์ล้มเหลว</td></tr>';
                 }
@@ -143,10 +301,38 @@
                             <span class="px-3 py-1 rounded-full text-xs font-bold ${roleConfig.className}">${roleConfig.label}</span>
                         </td>
                         <td class="px-6 py-4 text-center">
-                            <button class="text-gray-400 text-sm underline cursor-not-allowed" title="ยังไม่ได้เปิดฟังก์ชันแก้ไข">แก้ไข</button>
+                            <button type="button" class="edit-user-btn text-blue-600 hover:text-blue-800 text-sm font-semibold underline" data-user-id="${user.id}">แก้ไข</button>
                         </td>
                     </tr>
                 `;
+            }
+
+            bindUserRowActions() {
+                document.querySelectorAll('.edit-user-btn').forEach((button) => {
+                    button.addEventListener('click', () => this.openEditModal(button.dataset.userId));
+                });
+            }
+
+            openEditModal(userId) {
+                const user = this.users.find((item) => String(item.id) === String(userId));
+                if (!user) return;
+
+                this.editAlertBox.hide();
+                this.getElement('edit_user_id').value = user.id;
+                this.getElement('edit_emp_code').value = user.emp_code || '';
+                this.getElement('edit_full_name').value = user.full_name || '';
+                this.getElement('edit_role').value = user.role || 'officer';
+                this.getElement('edit_password').value = '';
+                this.editModal.classList.remove('hidden');
+                this.editModal.classList.add('flex');
+                this.getElement('edit_full_name').focus();
+            }
+
+            closeEditModal() {
+                this.editModal.classList.add('hidden');
+                this.editModal.classList.remove('flex');
+                this.editForm.reset();
+                this.editAlertBox.hide();
             }
 
             getRoleConfig(role) {
@@ -166,6 +352,178 @@
                 };
 
                 return roleMap[role] || roleMap.officer;
+            }
+
+            setDefaultAuditDates() {
+                const today = new Date();
+                const start = new Date();
+                start.setDate(today.getDate() - 7);
+                this.getElement('auditStartDate').value = start.toISOString().split('T')[0];
+                this.getElement('auditEndDate').value = today.toISOString().split('T')[0];
+            }
+
+            populateEmployeeFilter(users) {
+                const filter = this.getElement('auditEmployeeFilter');
+                const selectedValue = filter.value;
+                filter.innerHTML = '<option value="">ทั้งหมด</option>';
+
+                users.forEach((user) => {
+                    filter.insertAdjacentHTML(
+                        'beforeend',
+                        `<option value="${user.id}">${user.full_name} (${user.position || '-'})</option>`
+                    );
+                });
+
+                filter.value = selectedValue;
+            }
+
+            buildAuditQuery() {
+                const params = new URLSearchParams();
+                const startDate = this.getElement('auditStartDate').value;
+                const endDate = this.getElement('auditEndDate').value;
+                const employeeId = this.getElement('auditEmployeeFilter').value;
+
+                if (startDate) params.set('start_date', startDate);
+                if (endDate) params.set('end_date', endDate);
+                if (employeeId) params.set('employee_id', employeeId);
+
+                const query = params.toString();
+                return query ? `?${query}` : '';
+            }
+
+            async loadAuditLogs() {
+                this.accessLogTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400">กำลังโหลดข้อมูล...</td></tr>';
+                this.transactionLogTableBody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-400">กำลังโหลดข้อมูล...</td></tr>';
+
+                const query = this.buildAuditQuery();
+                await Promise.all([
+                    this.loadAccessLogs(query),
+                    this.loadTransactionLogs(query)
+                ]);
+            }
+
+            async loadAccessLogs(query) {
+                try {
+                    const result = await this.api.get(`/audit/access-logs${query}`);
+                    const rows = result.data || [];
+                    this.getElement('accessLogCount').textContent = `${rows.length.toLocaleString('th-TH')} รายการ`;
+                    this.accessLogTableBody.innerHTML = rows.length
+                        ? rows.map((row) => this.createAccessLogRow(row)).join('')
+                        : '<tr><td colspan="6" class="text-center py-8 text-gray-400">ไม่พบประวัติการเข้าใช้งานในช่วงที่เลือก</td></tr>';
+                } catch (error) {
+                    this.accessLogTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-red-500">ดึงประวัติการเข้าใช้งานล้มเหลว</td></tr>';
+                }
+            }
+
+            async loadTransactionLogs(query) {
+                try {
+                    const result = await this.api.get(`/audit/transaction-logs${query}`);
+                    const rows = result.data || [];
+                    this.getElement('transactionLogCount').textContent = `${rows.length.toLocaleString('th-TH')} รายการ`;
+                    this.transactionLogTableBody.innerHTML = rows.length
+                        ? rows.map((row) => this.createTransactionLogRow(row)).join('')
+                        : '<tr><td colspan="8" class="text-center py-8 text-gray-400">ไม่พบประวัติธุรกรรมในช่วงที่เลือก</td></tr>';
+                } catch (error) {
+                    this.transactionLogTableBody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-red-500">ดึงประวัติธุรกรรมล้มเหลว</td></tr>';
+                }
+            }
+
+            createAccessLogRow(row) {
+                const isActive = row.status === 'active' && !row.logout_at;
+                return `
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="px-5 py-4">
+                            <div class="font-semibold text-gray-800">${row.full_name || '-'}</div>
+                            <div class="text-xs text-gray-400">${row.emp_code || '-'}</div>
+                        </td>
+                        <td class="px-5 py-4 text-sm text-gray-600">${row.position || '-'}</td>
+                        <td class="px-5 py-4 text-sm text-gray-600">${row.terminal_name || '-'}</td>
+                        <td class="px-5 py-4 text-sm">${this.formatDateTime(row.login_at)}</td>
+                        <td class="px-5 py-4 text-sm">
+                            ${isActive ? '<span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">กำลังใช้งาน</span>' : this.formatDateTime(row.logout_at)}
+                        </td>
+                        <td class="px-5 py-4 text-center text-sm font-semibold text-indigo-700">${this.formatDuration(row.duration_minutes)}</td>
+                    </tr>
+                `;
+            }
+
+            createTransactionLogRow(row) {
+                const statusClass = row.status === 'active'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700';
+
+                return `
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="px-5 py-4 text-sm">${this.formatDateTime(row.action_time)}</td>
+                        <td class="px-5 py-4">
+                            <div class="font-semibold text-gray-800">${row.full_name || '-'}</div>
+                            <div class="text-xs text-gray-400">${row.emp_code || '-'}</div>
+                        </td>
+                        <td class="px-5 py-4 text-sm text-gray-600">${row.position || '-'}</td>
+                        <td class="px-5 py-4 text-sm font-semibold text-emerald-700">${row.transaction_type || '-'}</td>
+                        <td class="px-5 py-4 text-sm font-mono text-gray-700">${row.document_no || '-'}</td>
+                        <td class="px-5 py-4 text-sm text-gray-600">${row.member_name || '-'}</td>
+                        <td class="px-5 py-4 text-right font-semibold">${this.formatCurrency(row.amount || 0)}</td>
+                        <td class="px-5 py-4 text-center">
+                            <span class="px-2 py-1 rounded-full text-xs font-bold ${statusClass}">${row.status === 'active' ? 'ปกติ' : 'ยกเลิก'}</span>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            formatDateTime(value) {
+                if (!value) return '-';
+                return new Date(value).toLocaleString('th-TH', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            formatDuration(minutes) {
+                const totalMinutes = Number(minutes || 0);
+                if (totalMinutes < 1) return 'น้อยกว่า 1 นาที';
+
+                const hours = Math.floor(totalMinutes / 60);
+                const mins = totalMinutes % 60;
+                return hours ? `${hours} ชม. ${mins} นาที` : `${mins} นาที`;
+            }
+
+            async handleUpdateUser(event) {
+                event.preventDefault();
+                const userId = this.getElement('edit_user_id').value;
+                const password = this.getElement('edit_password').value;
+                const restoreButton = this.withButtonLoading(this.editSubmitButton, 'กำลังบันทึก...');
+                this.editAlertBox.hide();
+
+                try {
+                    await this.api.put(`/users/${userId}`, {
+                        full_name: this.getElement('edit_full_name').value.trim(),
+                        role: this.getElement('edit_role').value,
+                        password
+                    });
+
+                    const currentUser = this.session.getUser();
+                    if (currentUser && String(currentUser.employee_id) === String(userId)) {
+                        currentUser.full_name = this.getElement('edit_full_name').value.trim();
+                        currentUser.role = this.getElement('edit_role').value;
+                        this.session.saveUser(currentUser);
+                        this.setUserDisplay('displayUserName', (user) => {
+                            return `${user.full_name} <br><span class="text-xs text-yellow-300">(${this.getRoleConfig(user.role).label})</span>`;
+                        });
+                    }
+
+                    this.editAlertBox.showSuccess('แก้ไขข้อมูลผู้ใช้งานสำเร็จ');
+                    await this.loadUsers();
+                    await this.loadAuditLogs();
+                    setTimeout(() => this.closeEditModal(), 500);
+                } catch (error) {
+                    this.editAlertBox.showError(error.message);
+                } finally {
+                    restoreButton();
+                }
             }
 
             // แยกขั้นตอนสร้างผู้ใช้งานออกมาให้แต่ละหน้าที่ชัดเจนและแก้ง่าย

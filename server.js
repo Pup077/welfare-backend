@@ -71,6 +71,45 @@ class DocumentNumberService {
     }
 }
 
+class AuditService {
+    static async ensureTables(connection = promisePool) {
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS user_access_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                employee_id INT,
+                terminal_id INT,
+                login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                logout_at TIMESTAMP NULL,
+                status ENUM('active', 'logged_out') DEFAULT 'active',
+                FOREIGN KEY (employee_id) REFERENCES employees(id)
+            )
+        `);
+    }
+
+    static async recordLogin(employeeId, terminalId) {
+        await this.ensureTables();
+        const [result] = await promisePool.query(
+            'INSERT INTO user_access_logs (employee_id, terminal_id) VALUES (?, ?)',
+            [employeeId, terminalId || 1]
+        );
+        return result.insertId;
+    }
+
+    static async recordLogout(accessLogId) {
+        if (!accessLogId) {
+            return;
+        }
+
+        await this.ensureTables();
+        await promisePool.query(
+            `UPDATE user_access_logs
+             SET logout_at = CURRENT_TIMESTAMP, status = 'logged_out'
+             WHERE id = ? AND logout_at IS NULL`,
+            [accessLogId]
+        );
+    }
+}
+
 // ==========================================
 // 1. ตั้งค่าการเชื่อมต่อฐานข้อมูล MySQL
 // ==========================================
@@ -107,6 +146,16 @@ app.get('/api/setup-db', async (req, res) => {
                 position VARCHAR(100),
                 password_hash VARCHAR(255),
                 role ENUM('superadmin', 'admin', 'officer') DEFAULT 'officer'
+            );
+
+            CREATE TABLE IF NOT EXISTS user_access_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                employee_id INT,
+                terminal_id INT,
+                login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                logout_at TIMESTAMP NULL,
+                status ENUM('active', 'logged_out') DEFAULT 'active',
+                FOREIGN KEY (employee_id) REFERENCES employees(id)
             );
 
             CREATE TABLE IF NOT EXISTS bank_accounts (
@@ -314,18 +363,31 @@ app.post('/api/auth/login-secure', async (req, res) => {
         }
 
         const user = users[0];
+        const accessLogId = await AuditService.recordLogin(user.id, terminal_id || 1);
         return ApiResponse.success(res, {
             message: 'เข้าสู่ระบบสำเร็จ',
             user: { 
                 employee_id: user.id, 
                 emp_code: user.emp_code, 
                 full_name: user.full_name, 
+                position: user.position,
                 role: user.role || 'officer', 
-                terminal_id: terminal_id || 1 
+                terminal_id: terminal_id || 1,
+                access_log_id: accessLogId
             }
         });
     } catch (error) {
         return ApiResponse.error(res, 'ล็อกอินล้มเหลว');
+    }
+});
+
+// [POST] ออกจากระบบ (Logout)
+app.post('/api/auth/logout', async (req, res) => {
+    try {
+        await AuditService.recordLogout(req.body.access_log_id);
+        return ApiResponse.success(res, { message: 'บันทึกเวลาออกจากระบบสำเร็จ' });
+    } catch (error) {
+        return ApiResponse.error(res, 'บันทึกเวลาออกจากระบบล้มเหลว');
     }
 });
 
@@ -373,6 +435,160 @@ app.post('/api/auth/register', async (req, res) => {
         return ApiResponse.success(res, { message: 'สร้างผู้ใช้งานใหม่เรียบร้อยแล้ว' }, 201);
     } catch (error) {
         return ApiResponse.error(res, 'สร้างผู้ใช้งานล้มเหลว');
+    }
+});
+
+// [PUT] แก้ไขข้อมูลผู้ใช้งาน
+app.put('/api/users/:id', async (req, res) => {
+    try {
+        const { full_name, role, password } = req.body;
+        const userId = req.params.id;
+        const allowedRoles = ['superadmin', 'admin', 'officer'];
+
+        if (!full_name || !role) {
+            return ApiResponse.error(res, 'กรุณากรอกชื่อและสิทธิ์การใช้งานให้ครบถ้วน', 400);
+        }
+
+        if (!allowedRoles.includes(role)) {
+            return ApiResponse.error(res, 'สิทธิ์การใช้งานไม่ถูกต้อง', 400);
+        }
+
+        const [existing] = await promisePool.query('SELECT id FROM employees WHERE id = ?', [userId]);
+        if (existing.length === 0) {
+            return ApiResponse.error(res, 'ไม่พบผู้ใช้งานนี้', 404);
+        }
+
+        if (password) {
+            if (password.length < 6) {
+                return ApiResponse.error(res, 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร', 400);
+            }
+
+            await promisePool.query(
+                'UPDATE employees SET full_name = ?, role = ?, password_hash = ? WHERE id = ?',
+                [full_name, role, hashPassword(password), userId]
+            );
+        } else {
+            await promisePool.query(
+                'UPDATE employees SET full_name = ?, role = ? WHERE id = ?',
+                [full_name, role, userId]
+            );
+        }
+
+        return ApiResponse.success(res, { message: 'แก้ไขข้อมูลผู้ใช้งานสำเร็จ' });
+    } catch (error) {
+        return ApiResponse.error(res, 'แก้ไขข้อมูลผู้ใช้งานล้มเหลว');
+    }
+});
+
+// [GET] ประวัติการเข้าใช้งานระบบ
+app.get('/api/audit/access-logs', async (req, res) => {
+    try {
+        await AuditService.ensureTables();
+        const { start_date, end_date, employee_id } = req.query;
+        const filters = [];
+        const params = [];
+
+        if (start_date) {
+            filters.push('DATE(a.login_at) >= ?');
+            params.push(start_date);
+        }
+        if (end_date) {
+            filters.push('DATE(a.login_at) <= ?');
+            params.push(end_date);
+        }
+        if (employee_id) {
+            filters.push('a.employee_id = ?');
+            params.push(employee_id);
+        }
+
+        const [rows] = await promisePool.query(`
+            SELECT
+                a.id,
+                a.employee_id,
+                e.emp_code,
+                e.full_name,
+                e.position,
+                e.role,
+                t.name AS terminal_name,
+                a.login_at,
+                a.logout_at,
+                a.status,
+                TIMESTAMPDIFF(MINUTE, a.login_at, COALESCE(a.logout_at, CURRENT_TIMESTAMP)) AS duration_minutes
+            FROM user_access_logs a
+            LEFT JOIN employees e ON a.employee_id = e.id
+            LEFT JOIN terminals t ON a.terminal_id = t.id
+            ${filters.length ? `WHERE ${filters.join(' AND ')}` : ''}
+            ORDER BY a.login_at DESC
+            LIMIT 200
+        `, params);
+
+        return ApiResponse.success(res, { data: rows });
+    } catch (error) {
+        return ApiResponse.error(res, 'ดึงประวัติการเข้าใช้งานล้มเหลว');
+    }
+});
+
+// [GET] ประวัติการทำธุรกรรมของผู้ใช้งาน
+app.get('/api/audit/transaction-logs', async (req, res) => {
+    try {
+        const { start_date, end_date, employee_id } = req.query;
+        const startDate = start_date || '1970-01-01';
+        const endDate = end_date || '2999-12-31';
+        const employeeFilter = employee_id ? 'AND tx.employee_id = ?' : '';
+        const params = [startDate, endDate];
+        if (employee_id) {
+            params.push(employee_id);
+        }
+
+        const [rows] = await promisePool.query(`
+            SELECT *
+            FROM (
+                SELECT
+                    r.created_at AS action_time,
+                    r.employee_id,
+                    e.emp_code,
+                    e.full_name,
+                    e.position,
+                    'รับเงินสมทบ' AS transaction_type,
+                    r.receipt_no AS document_no,
+                    CONCAT(COALESCE(m.member_code, '-'), ' ', COALESCE(m.first_name, ''), ' ', COALESCE(m.last_name, '')) AS member_name,
+                    r.total_amount AS amount,
+                    r.status
+                FROM receipts r
+                LEFT JOIN employees e ON r.employee_id = e.id
+                LEFT JOIN members m ON r.member_id = m.id
+                WHERE DATE(r.created_at) BETWEEN ? AND ?
+
+                UNION ALL
+
+                SELECT
+                    v.created_at AS action_time,
+                    v.employee_id,
+                    e.emp_code,
+                    e.full_name,
+                    e.position,
+                    CASE
+                        WHEN v.expense_type = 'hospital' THEN 'จ่ายค่าชดเชยนอนโรงพยาบาล'
+                        WHEN v.expense_type = 'funeral' THEN 'จ่ายค่าจัดการศพ'
+                        ELSE 'จ่ายสวัสดิการ'
+                    END AS transaction_type,
+                    v.voucher_no AS document_no,
+                    CONCAT(COALESCE(m.member_code, '-'), ' ', COALESCE(m.first_name, ''), ' ', COALESCE(m.last_name, '')) AS member_name,
+                    v.total_amount AS amount,
+                    v.status
+                FROM vouchers v
+                LEFT JOIN employees e ON v.employee_id = e.id
+                LEFT JOIN members m ON v.member_id = m.id
+                WHERE DATE(v.created_at) BETWEEN ? AND ?
+            ) tx
+            WHERE 1 = 1 ${employeeFilter}
+            ORDER BY tx.action_time DESC
+            LIMIT 300
+        `, [startDate, endDate, startDate, endDate, ...(employee_id ? [employee_id] : [])]);
+
+        return ApiResponse.success(res, { data: rows });
+    } catch (error) {
+        return ApiResponse.error(res, 'ดึงประวัติธุรกรรมล้มเหลว');
     }
 });
 

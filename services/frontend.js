@@ -151,6 +151,23 @@
 
             button.addEventListener('click', () => {
                 if (window.confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
+                    const user = this.session.getUser();
+                    if (user && user.access_log_id) {
+                        const payload = JSON.stringify({ access_log_id: user.access_log_id });
+                        if (navigator.sendBeacon) {
+                            navigator.sendBeacon(
+                                `${this.api.baseUrl}/auth/logout`,
+                                new Blob([payload], { type: 'application/json' })
+                            );
+                        } else {
+                            fetch(`${this.api.baseUrl}/auth/logout`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: payload,
+                                keepalive: true
+                            }).catch(() => {});
+                        }
+                    }
                     this.session.clear();
                     window.location.href = redirectUrl;
                 }
