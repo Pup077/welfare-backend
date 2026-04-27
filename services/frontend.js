@@ -1,4 +1,5 @@
 (function attachWelfareApp(window) {
+    // ไฟล์นี้เป็นชั้นกลางของทุกหน้า HTML: รวมการเรียก API, session, alert และ helper พื้นฐานให้หน้าเว็บใช้รูปแบบเดียวกัน
     const BASE_API_URL = 'http://localhost:8000/api';
 
     class ApiClient {
@@ -42,6 +43,7 @@
     }
 
     class SessionManager {
+        // SessionManager เก็บข้อมูลผู้ใช้จากหน้า login เพื่อให้หน้าอื่นตรวจสิทธิ์และแสดงชื่อผู้ใช้ได้ทันที
         constructor(storageKey = 'user_session') {
             this.storageKey = storageKey;
         }
@@ -99,6 +101,7 @@
     }
 
     class AlertBoxController {
+        // AlertBoxController แปลงผลลัพธ์จาก API ให้เป็นข้อความสำเร็จ/ผิดพลาดที่ผู้ใช้เห็นบนหน้าจอ
         constructor(element) {
             this.element = element;
         }
@@ -123,6 +126,7 @@
     }
 
     class BasePage {
+        // BasePage คือฐานร่วมของแต่ละหน้า ช่วยลดโค้ดซ้ำเรื่อง API, session, ปุ่มโหลด และ logout
         constructor() {
             this.api = new ApiClient();
             this.session = new SessionManager();

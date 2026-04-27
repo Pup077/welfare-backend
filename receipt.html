@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+<!-- หน้ารับเงินสมทบใช้ค้นหาสมาชิก เพิ่มงวดชำระ และบันทึกใบเสร็จที่เชื่อมกับสมาชิกในฐานข้อมูล -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -89,6 +90,7 @@
             }
         }
     </style>
+    <!-- ใช้ shared frontend เพื่อเรียกเลขใบเสร็จอัตโนมัติ รายชื่อสมาชิก และ API บันทึกรับเงิน -->
     <script src="services/frontend.js"></script>
 </head>
 <body class="bg-gray-100 flex h-screen overflow-hidden">
@@ -246,6 +248,7 @@
     </div>
 
     <script>
+        // ReceiptPage เชื่อมตารางงวดชำระบนหน้าจอกับ /incomes/receipts พร้อมสร้างข้อมูลสำหรับพิมพ์ใบเสร็จ
         class ReceiptPage extends WelfareApp.BasePage {
             constructor() {
                 super();

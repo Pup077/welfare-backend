@@ -1,5 +1,6 @@
 version: '3.8'
 
+# docker-compose เชื่อม container API กับ MySQL ให้ server.js อ่านค่า DB_* แล้วติดต่อฐานข้อมูลชื่อ welfare_db ได้ทันที
 services:
   api:
     build: .

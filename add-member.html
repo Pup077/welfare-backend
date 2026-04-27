@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+<!-- หน้าเพิ่มสมาชิกใหม่เชื่อมฟอร์มข้อมูลบุคคลกับ API เพื่อสร้างสมาชิกและใช้ข้อมูลอ้างอิงจากฐานข้อมูล -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <style> body { font-family: 'Prompt', sans-serif; } </style>
+    <!-- โหลด shared frontend สำหรับเลขสมาชิกอัตโนมัติ, reference data และการส่งฟอร์มไป backend -->
     <script src="services/frontend.js"></script>
 </head>
 <body class="bg-gray-100 flex h-screen overflow-hidden">
@@ -92,6 +94,7 @@
     </main>
 
     <script>
+        // AddMemberPage เตรียมเลขสมาชิก/ตัวเลือกอ้างอิง แล้วแปลงข้อมูลฟอร์มเป็น payload สำหรับ POST /members
         class AddMemberPage extends WelfareApp.BasePage {
             constructor() {
                 super();

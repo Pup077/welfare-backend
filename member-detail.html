@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+<!-- หน้ารายละเอียดสมาชิกดึงข้อมูลสมาชิกหนึ่งคนพร้อมประวัติงวดชำระ เพื่อใช้ตรวจสอบสถานะและประวัติย้อนหลัง -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <style> body { font-family: 'Prompt', sans-serif; } </style>
+    <!-- ใช้ shared frontend เพื่อบังคับล็อกอินและเรียก API รายละเอียดสมาชิก/งวดชำระ -->
     <script src="services/frontend.js"></script>
 </head>
 <body class="bg-gray-100 flex h-screen overflow-hidden">
@@ -83,6 +85,7 @@
     </main>
 
     <script>
+        // MemberDetailPage อ่าน id จาก URL แล้วเรียก /members/:id และ /members/:id/installments เพื่อเติมข้อมูลลงหน้า
         class MemberDetailPage extends WelfareApp.BasePage {
             constructor() {
                 super();

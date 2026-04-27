@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+<!-- หน้ารายงานรวมข้อมูลจากหลาย API เพื่อดูรายรับ ค้างชำระ รายจ่าย ประวัติใบเสร็จ และรายการประจำวัน -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -127,6 +128,7 @@
             body.print-receipt-copy .receipt-print-stage { display: block !important; }
         }
     </style>
+    <!-- ใช้ shared frontend สำหรับ session, ApiClient, formatter และปุ่มออกจากระบบของหน้ารายงาน -->
     <script src="services/frontend.js"></script>
 </head>
 <body class="bg-gray-100 flex h-screen overflow-hidden">
@@ -370,6 +372,7 @@
     </div>
 
     <script>
+        // ReportsPage ผูกปุ่ม/แท็บกับ API รายงาน แล้วแปลงผลลัพธ์จาก backend เป็นตารางและเอกสารพิมพ์
         class ReportsPage extends WelfareApp.BasePage {
             constructor() {
                 super();

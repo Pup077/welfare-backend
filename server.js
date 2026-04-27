@@ -7,6 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// server.js เป็นศูนย์กลางของ backend: รับ request จากหน้า HTML, ประมวลผลกับ MySQL และส่ง JSON กลับไปให้ frontend
 class AppConfig {
     static PORT = 8000;
     static PASSWORD_SALT = 'WelfareFund_NakhonSi_2026';
@@ -27,6 +28,7 @@ class AppConfig {
 }
 
 class SecurityService {
+    // เข้ารหัสรหัสผ่านให้ตรงกันระหว่างตอนสร้างผู้ใช้ ตั้งรหัสผ่าน และล็อกอิน
     static hashPassword(password) {
         return crypto
             .createHash('sha256')
@@ -36,6 +38,7 @@ class SecurityService {
 }
 
 class ApiResponse {
+    // รวมรูปแบบ JSON response เพื่อให้ frontend ตรวจ status success/error ได้เหมือนกันทุก endpoint
     static success(res, payload = {}, statusCode = 200) {
         return res.status(statusCode).json({ status: 'success', ...payload });
     }
@@ -52,6 +55,7 @@ class QueryHelper {
 }
 
 class DocumentNumberService {
+    // สร้างเลขสมาชิก/ใบเสร็จ/ใบสำคัญจ่าย โดยเชื่อม prefix กับตารางที่ใช้ตรวจเลขล่าสุดในฐานข้อมูล
     static getConfig(type) {
         const configMap = {
             member: { prefix: 'MEM', table: 'members', column: 'member_code' },
@@ -72,6 +76,7 @@ class DocumentNumberService {
 }
 
 class AuditService {
+    // บันทึกเวลาเข้าออกระบบของผู้ใช้ เพื่อนำไปแสดงในหน้าจัดการผู้ใช้งานและรายงาน audit
     static async ensureTables(connection = promisePool) {
         await connection.query(`
             CREATE TABLE IF NOT EXISTS user_access_logs (

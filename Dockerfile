@@ -1,3 +1,4 @@
+# Dockerfile นี้บอกวิธีประกอบ backend ให้เป็น container: ติดตั้ง Node dependencies แล้วรัน server.js เป็น API หลัก
 # ใช้ Node.js เวอร์ชัน 18 ที่มีขนาดเล็ก (alpine)
 FROM node:18-alpine
 

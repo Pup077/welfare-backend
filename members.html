@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+<!-- หน้ารายชื่อสมาชิกทำหน้าที่ค้นหา/แสดงสมาชิก และส่งผู้ใช้ต่อไปยังหน้ารายละเอียดหรือหน้าเพิ่มสมาชิก -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <style> body { font-family: 'Prompt', sans-serif; } </style>
+    <!-- โหลดตัวช่วยร่วมเพื่อใช้ session guard และ ApiClient ในการเรียก /members และ /members/search -->
     <script src="services/frontend.js"></script>
 </head>
 <body class="bg-gray-100 flex h-screen overflow-hidden">
@@ -66,6 +68,7 @@
     </main>
 
     <script>
+        // MembersPage เชื่อมช่องค้นหาและตารางสมาชิกกับ backend เพื่อให้ข้อมูลหน้าจอตรงกับฐานข้อมูลล่าสุด
         class MembersPage extends WelfareApp.BasePage {
             constructor() {
                 super();

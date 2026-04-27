@@ -1,6 +1,7 @@
 // ==========================================
 // ไฟล์: services/api.js
 // หน้าที่: รวมคลาสเรียก API สำหรับหน้าเว็บที่ต้องการใช้งานแบบ OOP
+// ความเชื่อมโยง: แต่ละ Service ด้านล่างคือชื่อเรียกฝั่ง frontend ที่ map ไปยัง endpoint ใน server.js
 // ==========================================
 
 class BaseApiService {
@@ -44,6 +45,7 @@ class BaseApiService {
 }
 
 class AuthService extends BaseApiService {
+    // AuthService เชื่อมหน้าล็อกอิน/สมัครผู้ใช้กับกลุ่ม API /auth
     login(username, password, terminalId = 1) {
         return this.post('/auth/login-secure', {
             username,
@@ -65,6 +67,7 @@ class AuthService extends BaseApiService {
 }
 
 class MemberService extends BaseApiService {
+    // MemberService เชื่อมหน้าสมาชิกกับ API /members สำหรับค้นหา เพิ่ม แก้ไข และดูงวดชำระ
     getAll() {
         return this.get('/members');
     }
@@ -91,6 +94,7 @@ class MemberService extends BaseApiService {
 }
 
 class IncomeService extends BaseApiService {
+    // IncomeService ใช้กับหน้ารับเงินสมทบ เพื่อบันทึกหรือยกเลิกใบเสร็จใน backend
     createReceipt(receiptData) {
         return this.post('/incomes/receipts', receiptData);
     }
@@ -103,6 +107,7 @@ class IncomeService extends BaseApiService {
 }
 
 class ExpenseService extends BaseApiService {
+    // ExpenseService ใช้กับหน้าเบิกจ่าย เพื่อเลือก endpoint ตามประเภทสวัสดิการที่ผู้ใช้กรอก
     createHospitalVoucher(voucherData) {
         return this.post('/expenses/hospital', voucherData);
     }
@@ -113,6 +118,7 @@ class ExpenseService extends BaseApiService {
 }
 
 class ReportService extends BaseApiService {
+    // ReportService รวม endpoint รายงานเพื่อให้หน้ารายงานและแดชบอร์ดดึงข้อมูลสรุปจากฐานข้อมูล
     getDailyIncome(dateStr) {
         return this.get(`/reports/daily-income?date=${dateStr}`);
     }
@@ -143,6 +149,7 @@ class ReportService extends BaseApiService {
 }
 
 class UtilityService extends BaseApiService {
+    // UtilityService ดึงข้อมูลอ้างอิง เลขเอกสารถัดไป และค่าตั้งค่าที่หลายหน้าต้องใช้ร่วมกัน
     getReferences() {
         return this.get('/references');
     }
